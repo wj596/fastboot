@@ -1,0 +1,56 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.jsets</groupId>
+		<artifactId>fastboot</artifactId>
+		<version>0.0.1</version>
+	</parent>
+	<artifactId>fb-frame</artifactId>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.jsets</groupId>
+			<artifactId>fb-common</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.jsets</groupId>
+			<artifactId>fb-security</artifactId>
+		</dependency>
+		<!-- spring boot 配置工具 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-autoconfigure</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<!-- spring web -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-web</artifactId>
+		</dependency>
+		<!-- spring 事务 -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-tx</artifactId>
+		</dependency>
+		<!-- jackson JSON工具 -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+		</dependency>
+		<!-- mybatis 增强工具 -->
+		<dependency>
+			<groupId>com.baomidou</groupId>
+			<artifactId>mybatis-plus</artifactId>
+			<version>${mybatis-plus.version}</version>
+		</dependency>
+		<!-- api文档工具 -->
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-boot-starter</artifactId>
+			<version>${springfox-boot-starter.version}</version>
+		</dependency>
+
+	</dependencies>
+</project>

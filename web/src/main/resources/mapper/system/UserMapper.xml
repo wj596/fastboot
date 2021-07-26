@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.jsets.fastboot.mapper.system.UserMapper">
+
+	<resultMap id="UserMap" type="org.jsets.fastboot.model.entity.system.User" extends="baseEntityMapper.BaseMap">
+		<result column="account" property="account" javaType="java.lang.String"/>
+		<result column="password" property="password" javaType="java.lang.String"/>
+		<result column="name" property="name" javaType="java.lang.String"/>
+		<result column="org_id" property="orgId" javaType="java.lang.String"/>
+		<result column="email" property="email" javaType="java.lang.String"/>
+		<result column="mobile" property="mobile" javaType="java.lang.String"/>
+		<result column="sex" property="sex" javaType="java.lang.Integer"/>
+		<result column="status" property="status" javaType="java.lang.Integer"/>
+		<result column="avatar" property="avatar" javaType="java.lang.String"/>
+	</resultMap>
+	
+</mapper>

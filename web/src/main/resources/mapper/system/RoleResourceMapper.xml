@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.jsets.fastboot.mapper.system.RoleResourceMapper">
+
+	<resultMap id="RoleMap" type="org.jsets.fastboot.model.entity.system.Resource" extends="baseEntityMapper.BaseMap">
+		<result column="code" property="code" javaType="java.lang.String"/>
+		<result column="title" property="title" javaType="java.lang.String"/>
+		<result column="type" property="type" javaType="java.lang.Integer"/>
+		<result column="http_method" property="httpMethod" javaType="java.lang.String"/>
+		<result column="path" property="path" javaType="java.lang.String"/>
+		<result column="parent_id" property="parentId" javaType="java.lang.Long"/>
+		<result column="status" property="status" javaType="java.lang.Integer"/>
+		<result column="sequence_number" property="sequenceNumber" javaType="java.lang.Integer"/>
+		<result column="remark" property="remark" javaType="java.lang.String"/>
+	</resultMap>
+	
+	<select id="selectRoleListByUserId" resultMap="RoleMap" parameterType="Long">
+		SELECT T.ID,T.CODE,T.NAME,T.STATUS,T.SEQUENCE_NUMBER
+		FROM T_ROLE T 
+		JOIN T_USER_ROLE TU ON T.ID = TU.ROLE_ID 
+		WHERE T.STATUS = 0  
+		AND TU.USER_ID = #{userId}
+	</select>
+	
+	<select id="selectFuncCodeListByUsername" resultType="String" parameterType="String">
+		SELECT T.CODE
+		FROM SYS_RESOURCE T 
+		JOIN SYS_ROLE_RESOURCE RR ON T.ID = RR.RESOURCE_ID 
+		JOIN SYS_USER_ROLE UR ON UR.ROLE_ID = RR.ROLE_ID 
+		JOIN SYS_USER U ON UR.USER_ID = U.ID
+		WHERE T.STATUS = 0
+		AND T.TYPE = 3
+		AND U.ACCOUNT = #{username}
+	</select>
+
+</mapper>

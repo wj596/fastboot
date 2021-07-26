@@ -1,0 +1,92 @@
+#----------------------     全局配置        -----------------------
+server:
+  port: 8080 #端口
+  #servlet:
+    #context-path: /baseapis #路径上下文 
+
+spring:
+  profiles:       
+    active: dev # dev为开发环境、test为测试环境、prod为正式环境  上线需切换，切记
+  application: 
+    name: fastboot #系统名称
+  servlet: 
+    multipart: # 附件大小限制
+      max-file-size: 10240MB
+      max-request-size: 10240MB
+  cache:
+    type: redis
+  redis: #单机
+    database: 0
+    timeout: 6000ms 
+    host: localhost
+    port: 6379 
+    #password: 123456
+    lettuce:  
+      pool:
+        max-active: 1000   # 连接池最大连接数（使用负值表示没有限制）
+        max-idle: 10       # 连接池中的最大空闲连接
+        max-wait: -1       # 连接池最大阻塞等待时间（使用负值表示没有限制）
+        min-idle:  5       # 连接池中的最小空闲连接 
+  datasource:
+    name: druidDataSource
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      driverClassName: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://localhost:3306/fastboot?useUnicode=true&characterEncoding=utf8&serverTimezone=GMT%2B8
+      username: root
+      password: 123456
+      webStatFilter: 
+        enabled: true
+      statViewServlet:
+        enabled: true               
+        allow: #设置白名单，不填则允许所有访问
+        url-pattern: /druid/*
+        login-username: fastboot #控制台管理用户名
+        login-password: 123456 #控制台管理用户密码
+      filter:
+        stat:
+          enabled: true
+          log-slow-sql: true #慢SQL记录
+          merge-sql: true
+        wall:
+          enabled: true
+          config:
+            multi-statement-allow: 
+              truespring: 
+  
+
+# mybatis-plus 配置
+mybatis-plus:
+  mapper-locations:
+    - classpath:mapper/**/*.xml
+  type-aliases-package: org.jsets.fastboot.entity.* #实体，多个package用逗号或者分号分隔
+  type-enums-package: org.jsets.fastboot.enums.* #枚举，多个package用逗号或者分号分隔
+  configuration:
+    default-enum-type-handler: org.apache.ibatis.type.EnumOrdinalTypeHandler #enum处理器
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #控制台打印SQL,方便调试,上线请注释掉
+  global-config: 
+    banner: false #打印mybatisplus的logo
+    db-config: #如何选择ID类型请参考 “使用手册-ID类型一节”
+      id-type: ASSIGN_UUID #主键类型  AUTO:"数据库ID自增"、INPUT:"用户输入ID",、ASSIGN_UUID:"UUID"、ASSIGN_ID:"系统内置的全局ID"
+
+# fastboot 配置
+fastboot:
+  swagger:
+    enable: true #是否开启swagger，生产环境建议关闭
+    app-name: fastboot #项目名称
+    app-version: 0.0.1 #项目版本
+    app-desc: fastboot #项目描述
+    app-debug-address: http://localhost:${server.port} #项目调试地址
+    contact-name: wangjie #联系人姓名
+    contact-url: #联系地址
+    contact-email: 918952016@qq.com #联系人邮件
+  security:
+    cors-enabled: true #是否允许跨域访问
+    captcha-enabled: false #是否启用验证码
+    session-timeout: 1800 #会话有效期，单位秒
+    token-sign-key: abcdee78985eve*(_)fdafec #令牌签名密钥
+    auth-rules:
+      - /ping/**-->anon 
+      - /login/**-->login #登录
+      - /logout/**-->logout #登出
+      - /**-->token #所有请求都必须验证令牌

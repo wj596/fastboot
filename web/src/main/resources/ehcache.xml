@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="http://ehcache.org/ehcache.xsd"
+	updateCheck="false">
+	<diskStore path="java.io.tmpdir" />
+	<defaultCache eternal="false" maxElementsInMemory="1000"
+		overflowToDisk="false" diskPersistent="false" timeToIdleSeconds="0"
+		timeToLiveSeconds="3600" memoryStoreEvictionPolicy="LRU" />
+
+	<!-- ================= shiro相关缓存配置 ==================== -->
+	<!-- 配置说明： -->
+	<!-- 1：各类数据分开存储可有效提升读写效率 -->
+	<!-- 2：各类数据的过期时间不同、缓存目标不同 -->
+
+	<!-- 活跃的SESSION缓存 -->
+	<cache name="shiro-activeSessionCache" maxEntriesLocalHeap="2000"
+		overflowToDisk="true" eternal="true" statistics="true">
+	</cache>
+	<!-- 密码重试次数缓存 -->
+	<cache name="shiro-passwordRetryCache" maxEntriesLocalHeap="2000"
+		overflowToDisk="true" eternal="true" statistics="true">
+	</cache>
+	<!-- 保持账号唯一用户登陆缓存 -->
+	<cache name="shiro-keepOneUserCache" maxEntriesLocalHeap="2000"
+		overflowToDisk="true" eternal="true" statistics="true">
+	</cache>
+	<!-- 认证数据缓存 ，最后一次访问后一小时失效 -->
+	<!-- 意味着如果此条数据一直使用则永远不失效，除非超过最大缓存数量 -->
+	<cache name="shiro-authenticationCache" maxEntriesLocalHeap="2000"
+		overflowToDisk="false" eternal="false" timeToIdleSeconds="3600"
+		statistics="true">
+	</cache>
+	<!-- 授权数据缓存 ，最后一次访问后一小时失效 -->
+	<!-- 意味着如果此条数据一直使用则永远不失效，除非超过最大缓存数量 -->
+	<cache name="shiro-authorizationCache" maxEntriesLocalHeap="2000"
+		overflowToDisk="false" eternal="false" timeToIdleSeconds="3600"
+		statistics="true">
+	</cache>
+	<!-- 已使用过的令牌缓存 ，仅存活一小时 -->
+	<cache name="shiro-tokenBurnersCache" maxEntriesLocalHeap="2000"
+		overflowToDisk="true" eternal="false" timeToLiveSeconds="3600"
+		statistics="true">
+	</cache>
+
+</ehcache>
