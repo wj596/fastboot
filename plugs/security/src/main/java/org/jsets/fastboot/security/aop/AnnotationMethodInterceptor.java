@@ -21,7 +21,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.jsets.fastboot.security.SecurityManager;
+import org.jsets.fastboot.security.SecurityUtils;
 import org.jsets.fastboot.security.exception.RuntimeForbiddenException;
 import org.jsets.fastboot.security.exception.RuntimeUnauthorizedException;
 import lombok.extern.slf4j.Slf4j;
@@ -31,21 +31,15 @@ import org.aspectj.lang.reflect.AdviceSignature;
 public abstract class AnnotationMethodInterceptor {
 	
 	protected final Class<? extends Annotation> annotationClass;
-	protected final SecurityManager securityManager;
-
-	public AnnotationMethodInterceptor(SecurityManager securityManager, Class<? extends Annotation> annotationClass) {
-		this.securityManager = securityManager;
+	
+	public AnnotationMethodInterceptor(Class<? extends Annotation> annotationClass) {
 		this.annotationClass = annotationClass;
 	}
-
-    public SecurityManager getSecurityManager() {
-		return securityManager;
-	}
-
+	
 	public Class<? extends Annotation> getAnnotationClass() {
         return this.annotationClass;
     }
-	
+
 	protected Method getInvokeMethod(JoinPoint joinPoint) {
 		if (joinPoint.getSignature() instanceof MethodSignature) {
             return ((MethodSignature) joinPoint.getSignature()).getMethod();
@@ -54,6 +48,10 @@ public abstract class AnnotationMethodInterceptor {
         } else {
             throw new IllegalArgumentException("The joint point signature is invalid: expected a MethodSignature or an AdviceSignature but was " + joinPoint.getSignature());
         }
+    }
+	
+	protected Object[] getInvokeMethodArgs(JoinPoint joinPoint) {
+		return joinPoint.getArgs();
     }
 	
 	protected Object getInvokeObject(JoinPoint joinPoint) {
@@ -84,11 +82,11 @@ public abstract class AnnotationMethodInterceptor {
     }
     
     protected void assertAuthenticated(JoinPoint joinPoint)   {
-    	if(!this.getSecurityManager().isAuthenticated()) {
+    	if(!SecurityUtils.isAuthenticated()) {
     		if(log.isInfoEnabled()) {
     			log.info("未认证, 拒绝访问["+ this.getInvokeMethod(joinPoint) +"]");
     		}
-    		throw new RuntimeUnauthorizedException(this.getSecurityManager().getProperties().getUnauthorizedTips());
+    		throw new RuntimeUnauthorizedException(SecurityUtils.getProperties().getUnauthorizedTips());
     	}
 		if(log.isInfoEnabled()) {
 			log.info("已认证, 允许访问["+ this.getInvokeMethod(joinPoint) +"]");
@@ -97,7 +95,7 @@ public abstract class AnnotationMethodInterceptor {
     
     protected void assertAllowed(boolean allowed)   {
     	if(!allowed) {
-    		throw new RuntimeForbiddenException(this.getSecurityManager().getProperties().getForbiddenTips());
+    		throw new RuntimeForbiddenException(SecurityUtils.getProperties().getForbiddenTips());
     	}
     }
     

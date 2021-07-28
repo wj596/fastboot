@@ -20,10 +20,12 @@ package org.jsets.fastboot.security.realm;
 import java.util.Set;
 import org.jsets.fastboot.common.util.CollectionUtils;
 import org.jsets.fastboot.security.IAccountProvider;
-import org.jsets.fastboot.security.SecurityManager;
+import org.jsets.fastboot.security.IEncryptProvider;
 import org.jsets.fastboot.security.auth.AuthRequest;
 import org.jsets.fastboot.security.auth.AuthorizationInfo;
+import org.jsets.fastboot.security.config.SecurityProperties;
 import org.jsets.fastboot.security.dao.PasswdRetryRecordDao;
+import org.jsets.fastboot.security.listener.ListenerManager;
 
 /**
  * 
@@ -32,8 +34,11 @@ import org.jsets.fastboot.security.dao.PasswdRetryRecordDao;
  *
  */
 public abstract class AbstractRealm implements Realm {
-
-	private SecurityManager securityManager;
+	
+	private ListenerManager listenerManager;
+	private SecurityProperties properties;
+	private IAccountProvider accountProvider;
+	private IEncryptProvider encryptProvider;
 	private PasswdRetryRecordDao passwdRetryRecordDao;
 
 	@Override
@@ -42,28 +47,52 @@ public abstract class AbstractRealm implements Realm {
 	}
 
 	public AuthorizationInfo getAuthorizationInfo(String username) {
-		IAccountProvider accountProvider = this.getSecurityManager().getAccountProvider();
 		AuthorizationInfo info =  new AuthorizationInfo();
-		Set<String> roles = accountProvider.loadRoles(username);
+		Set<String> roles = this.accountProvider.loadRoles(username);
 		if(CollectionUtils.notEmpty(roles)) { 
 			info.setRoles(roles);
 		}
-		Set<String> permissions = accountProvider.loadPermissions(username);
+		Set<String> permissions = this.accountProvider.loadPermissions(username);
 		if(CollectionUtils.notEmpty(permissions)) { 
 			info.setPermissions(permissions);
 		}
 		return info;
 	}
 
-	public SecurityManager getSecurityManager() {
-		return securityManager;
+
+	protected ListenerManager getListenerManager() {
+		return listenerManager;
 	}
 
-	protected void setSecurityManager(SecurityManager securityManager) {
-		this.securityManager = securityManager;
+	protected void setListenerManager(ListenerManager listenerManager) {
+		this.listenerManager = listenerManager;
 	}
 
-	public PasswdRetryRecordDao getPasswdRetryRecordDao() {
+	protected SecurityProperties getProperties() {
+		return properties;
+	}
+
+	protected void setProperties(SecurityProperties properties) {
+		this.properties = properties;
+	}
+
+	protected IAccountProvider getAccountProvider() {
+		return accountProvider;
+	}
+
+	protected void setAccountProvider(IAccountProvider accountProvider) {
+		this.accountProvider = accountProvider;
+	}
+	
+	protected IEncryptProvider getEncryptProvider() {
+		return encryptProvider;
+	}
+
+	protected void setEncryptProvider(IEncryptProvider encryptProvider) {
+		this.encryptProvider = encryptProvider;
+	}
+
+	protected PasswdRetryRecordDao getPasswdRetryRecordDao() {
 		return passwdRetryRecordDao;
 	}
 

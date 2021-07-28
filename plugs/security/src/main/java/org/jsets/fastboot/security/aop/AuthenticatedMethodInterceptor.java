@@ -19,14 +19,13 @@ package org.jsets.fastboot.security.aop;
 
 import java.lang.annotation.Annotation;
 import org.aspectj.lang.JoinPoint;
-import org.jsets.fastboot.security.SecurityManager;
 import org.jsets.fastboot.security.exception.ForbiddenException;
 import org.jsets.fastboot.security.exception.UnauthorizedException;
 
 public class AuthenticatedMethodInterceptor extends AnnotationMethodInterceptor {
 
-	public AuthenticatedMethodInterceptor(SecurityManager securityManager, Class<? extends Annotation> annotationClass) {
-		super(securityManager, annotationClass);
+	public AuthenticatedMethodInterceptor(Class<? extends Annotation> annotationClass) {
+		super(annotationClass);
 	}
 
 	@Override

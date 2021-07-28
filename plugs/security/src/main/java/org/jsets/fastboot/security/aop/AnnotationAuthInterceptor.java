@@ -19,34 +19,33 @@ package org.jsets.fastboot.security.aop;
 
 import java.util.List;
 import org.aspectj.lang.JoinPoint;
-import org.jsets.fastboot.security.SecurityManager;
 import org.jsets.fastboot.security.annotation.HasAnyPermissions;
 import org.jsets.fastboot.security.annotation.HasAnyRoles;
 import org.jsets.fastboot.security.annotation.HasPermission;
 import org.jsets.fastboot.security.annotation.HasRole;
 import org.jsets.fastboot.security.annotation.Authenticated;
+import org.jsets.fastboot.security.annotation.HMACAuthenticate;
 import com.google.common.collect.Lists;
 
 public class AnnotationAuthInterceptor {
 	
 	protected List<AnnotationMethodInterceptor> methodInterceptors = Lists.newArrayList();
 
-	protected AnnotationAuthInterceptor(SecurityManager securityManager) {
-		methodInterceptors.add(new AuthenticatedMethodInterceptor(securityManager, Authenticated.class));
-		methodInterceptors.add(new HasRoleMethodInterceptor(securityManager, HasRole.class));
-		methodInterceptors.add(new HasAnyRolesMethodInterceptor(securityManager, HasAnyRoles.class));
-		methodInterceptors.add(new HasPermissionMethodInterceptor(securityManager, HasPermission.class));
-		methodInterceptors.add(new HasAnyPermissionsMethodInterceptor(securityManager, HasAnyPermissions.class));
+	protected AnnotationAuthInterceptor() {
+		methodInterceptors.add(new HMACAuthenticateMethodInterceptor(HMACAuthenticate.class));
+		methodInterceptors.add(new AuthenticatedMethodInterceptor(Authenticated.class));
+		methodInterceptors.add(new HasRoleMethodInterceptor(HasRole.class));
+		methodInterceptors.add(new HasAnyRolesMethodInterceptor(HasAnyRoles.class));
+		methodInterceptors.add(new HasPermissionMethodInterceptor(HasPermission.class));
+		methodInterceptors.add(new HasAnyPermissionsMethodInterceptor(HasAnyPermissions.class));
 	}
 
 	protected void interception(JoinPoint joinPoint) throws Throwable {
-
 		for(AnnotationMethodInterceptor methodInterceptor : methodInterceptors) {
 			if(methodInterceptor.supports(joinPoint)) {
 				methodInterceptor.doAuthenticate(joinPoint);
 			}
 		}
-		
 	}
 
 }

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import java.util.List;
-import org.springframework.http.HttpStatus;
 
 /**
  * 
@@ -23,28 +22,25 @@ public class ListResp<T> extends BaseResp{
 	private static final long serialVersionUID = 1L;
 
 	@ApiModelProperty(value="列表")
-	private List<T> data;
+	private List<T> result;
 	@ApiModelProperty(value="列表条数")
 	private Long total;//总数据条数
 	
 	public static <T> ListResp<T> ok() {
 		ListResp<T> baseReturn = new ListResp<T>();
-		baseReturn.setSucceed(SUCCEED);
-		baseReturn.setStatus(HttpStatus.OK);
+		baseReturn.setCode(RespCode.SUCCEED);
 		return baseReturn;
 	}
 	
 	public static <T> ListResp<T> fail() {
 		ListResp<T> baseReturn = new ListResp<T>();
-		baseReturn.setSucceed(FAILED);
-		baseReturn.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+		baseReturn.setCode(RespCode.FAILED);
 		return baseReturn;
 	}
 	
 	public static <T> ListResp<T> fail(String message) {
 		ListResp<T> baseReturn = new ListResp<T>();
-		baseReturn.setSucceed(FAILED);
-		baseReturn.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+		baseReturn.setCode(RespCode.FAILED);
 		baseReturn.setMessage(message);
 		return baseReturn;
 	}

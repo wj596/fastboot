@@ -26,9 +26,7 @@ import org.jsets.fastboot.security.auth.AuthRequest;
 import org.jsets.fastboot.security.auth.AuthResponse;
 import org.jsets.fastboot.security.auth.AuthenticationInfo;
 import org.jsets.fastboot.security.auth.UsernamePasswordRequest;
-import org.jsets.fastboot.security.config.SecurityProperties;
 import org.jsets.fastboot.security.exception.UnauthorizedException;
-import org.jsets.fastboot.security.listener.ListenerManager;
 import org.jsets.fastboot.security.util.WebUtils;
 import org.springframework.http.HttpStatus;
 import java.util.Set;
@@ -66,39 +64,36 @@ public class LoginFilter extends AbstractInnerFilter {
 		authRequest.setUserHost(WebUtils.getClientIp(servletRequest));
 		authRequest.setUserAgent(WebUtils.getUserAgent(servletRequest));
 
-		ListenerManager listener = this.getSecurityManager().getListenerManager();
-		SecurityProperties properties = this.getSecurityManager().getProperties();
-
 		if(StringUtils.isBlank(authRequest.getUsername())) {
-			listener.onLoginFailure(authRequest, properties.getUsernameBlankTips());
-			throw new IllegalArgumentException(properties.getUsernameBlankTips());
+			this.getListenerManager().onLoginFailure(authRequest, this.getProperties().getUsernameBlankTips());
+			throw new IllegalArgumentException(this.getProperties().getUsernameBlankTips());
 		}
 
 		if(StringUtils.isBlank(authRequest.getPassword())) {
-			listener.onLoginFailure(authRequest, properties.getPasswordBlankTips());
-			throw new IllegalArgumentException(properties.getPasswordBlankTips());
+			this.getListenerManager().onLoginFailure(authRequest, this.getProperties().getPasswordBlankTips());
+			throw new IllegalArgumentException(this.getProperties().getPasswordBlankTips());
 		}
 
-		if(properties.isCaptchaEnabled()){
+		if(this.getProperties().isCaptchaEnabled()){
 			if(StringUtils.isBlank(authRequest.getCaptchaKey())) {
-				listener.onLoginFailure(authRequest, properties.getCaptchaKeyBlankTips());
-				throw new IllegalArgumentException(properties.getCaptchaKeyBlankTips());
+				this.getListenerManager().onLoginFailure(authRequest, this.getProperties().getCaptchaKeyBlankTips());
+				throw new IllegalArgumentException(this.getProperties().getCaptchaKeyBlankTips());
 			}
 			if(StringUtils.isBlank(authRequest.getCaptcha())) {
-				listener.onLoginFailure(authRequest, properties.getCaptchaBlankTips());
-				throw new IllegalArgumentException(properties.getCaptchaBlankTips());
+				this.getListenerManager().onLoginFailure(authRequest, this.getProperties().getCaptchaBlankTips());
+				throw new IllegalArgumentException(this.getProperties().getCaptchaBlankTips());
 			}
-			if(!this.getSecurityManager().getCaptchaProvider().validateCaptcha(authRequest.getCaptchaKey(), authRequest.getCaptcha())) {
-				listener.onLoginFailure(authRequest, properties.getCaptchaErrorTips());
-				throw new UnauthorizedException(properties.getCaptchaErrorTips());
+			if(!this.getCaptchaProvider().validateCaptcha(authRequest.getCaptchaKey(), authRequest.getCaptcha())) {
+				this.getListenerManager().onLoginFailure(authRequest, this.getProperties().getCaptchaErrorTips());
+				throw new UnauthorizedException(this.getProperties().getCaptchaErrorTips());
 			}
 		}
 
-		AuthenticationInfo info = this.getSecurityManager().login(authRequest);
+		AuthenticationInfo info = this.getAuthenticator().login(authRequest);
 		AuthResponse authResponse = AuthResponse.succeed();
-		authResponse.setMessage(properties.getLoginSucceedTips());
+		authResponse.setMessage(this.getProperties().getLoginSucceedTips());
 		authResponse.setAccessToken(info.getToken().getAccessToken());
-		listener.onLoginSuccess(authRequest);
+		this.getListenerManager().onLoginSuccess(authRequest);
 		writeAuthResponse(servletResponse, HttpStatus.OK.value(), authResponse);
 		return false;
 	}

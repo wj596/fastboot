@@ -20,14 +20,10 @@ package org.jsets.fastboot.security.realm;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.jsets.fastboot.common.util.StringUtils;
-import org.jsets.fastboot.security.IAccountProvider;
-import org.jsets.fastboot.security.IEncryptProvider;
 import org.jsets.fastboot.security.auth.AuthRequest;
 import org.jsets.fastboot.security.auth.AuthenticationInfo;
 import org.jsets.fastboot.security.auth.UsernamePasswordRequest;
-import org.jsets.fastboot.security.config.SecurityProperties;
 import org.jsets.fastboot.security.exception.UnauthorizedException;
-import org.jsets.fastboot.security.listener.ListenerManager;
 import org.jsets.fastboot.security.model.IAccount;
 
 /**
@@ -47,47 +43,43 @@ public class UsernamePasswordRealm extends AbstractRealm {
 			return null;
 		}
 
-		ListenerManager listener = this.getSecurityManager().getListenerManager();
-		SecurityProperties properties = this.getSecurityManager().getProperties();
-		IAccountProvider accountProvider = this.getSecurityManager().getAccountProvider();
-		IEncryptProvider encryptProvider = this.getSecurityManager().getEncryptProvider();
 		UsernamePasswordRequest request = (UsernamePasswordRequest)authRequest;
 		if(StringUtils.isEmpty(request.getUsername())){
 			log.warn("认证失败，用户名为空");
-			listener.onLoginFailure(authRequest, properties.getUsernameBlankTips());
-			throw new UnauthorizedException(properties.getUsernameBlankTips());
+			this.getListenerManager().onLoginFailure(authRequest, this.getProperties().getUsernameBlankTips());
+			throw new UnauthorizedException(this.getProperties().getUsernameBlankTips());
 		}
 		if(StringUtils.isEmpty(request.getPassword())){
 			log.warn("认证失败，密码为空");
-			listener.onLoginFailure(authRequest, properties.getPasswordBlankTips());
-			throw new UnauthorizedException(properties.getPasswordBlankTips());
+			this.getListenerManager().onLoginFailure(authRequest, this.getProperties().getPasswordBlankTips());
+			throw new UnauthorizedException(this.getProperties().getPasswordBlankTips());
 		}
 
 		IAccount account = null;
 		try{
-			account = accountProvider.loadAccount(request.getUsername());
+			account = this.getAccountProvider().loadAccount(request.getUsername());
 		}catch (UnauthorizedException ex){
 			log.error("认证失败：{}",ex.getMessage(),ex);
-			listener.onLoginFailure(authRequest, ex.getMessage());
+			this.getListenerManager().onLoginFailure(authRequest, ex.getMessage());
 			throw ex;
 		}
 		if (Objects.isNull(account)) {
 			log.warn("认证失败，账号为空");
-			listener.onLoginFailure(authRequest, properties.getUsernameOrPasswordErrorTips());
-			throw new UnauthorizedException(properties.getUsernameOrPasswordErrorTips());
+			this.getListenerManager().onLoginFailure(authRequest, this.getProperties().getUsernameOrPasswordErrorTips());
+			throw new UnauthorizedException(this.getProperties().getUsernameOrPasswordErrorTips());
 		}
 		
-		String encrypted = encryptProvider.encrypt(request.getPassword());
+		String encrypted = this.getEncryptProvider().encrypt(request.getPassword());
 		if (!Objects.equals(encrypted, account.getPassword())) {
-			Integer passwordRetryMaximum = properties.getPasswordRetryMaximum();
+			Integer passwordRetryMaximum = this.getProperties().getPasswordRetryMaximum();
 			if(Objects.nonNull(passwordRetryMaximum)) {
 				int retries = this.getPasswdRetryRecordDao().increaseAndGet(request.getUsername());
 				log.warn("密码最大重试次数{}，当前第{}次", passwordRetryMaximum, retries);
-				listener.onPasswordRetry(request.getUsername(), passwordRetryMaximum, retries);
+				this.getListenerManager().onPasswordRetry(request.getUsername(), passwordRetryMaximum, retries);
 			}
 			log.warn("认证失败，密码错误");
-			listener.onLoginFailure(authRequest, properties.getUsernameOrPasswordErrorTips());
-			throw new UnauthorizedException(properties.getUsernameOrPasswordErrorTips());
+			this.getListenerManager().onLoginFailure(authRequest, this.getProperties().getUsernameOrPasswordErrorTips());
+			throw new UnauthorizedException(this.getProperties().getUsernameOrPasswordErrorTips());
 		}
 
 		log.info("账号[{}]认证成功", account.getAccount());

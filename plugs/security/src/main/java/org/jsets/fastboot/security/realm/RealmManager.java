@@ -19,8 +19,8 @@ package org.jsets.fastboot.security.realm;
 
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
-import org.jsets.fastboot.security.Manager;
-import org.jsets.fastboot.security.SecurityManager;
+import org.jsets.fastboot.security.IAccountProvider;
+import org.jsets.fastboot.security.IEncryptProvider;
 import org.jsets.fastboot.security.auth.AuthRequest;
 import org.jsets.fastboot.security.auth.AuthenticationInfo;
 import org.jsets.fastboot.security.auth.AuthorizationInfo;
@@ -29,8 +29,10 @@ import org.jsets.fastboot.security.cache.InnerCacheManager;
 import org.jsets.fastboot.security.config.SecurityProperties;
 import org.jsets.fastboot.security.dao.PasswdRetryRecordDao;
 import org.jsets.fastboot.security.exception.UnauthorizedException;
+import org.jsets.fastboot.security.listener.ListenerManager;
 import org.jsets.fastboot.security.session.Session;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -42,37 +44,56 @@ import java.util.Set;
  * @date 2021.07.05 21:58
  */
 @Slf4j
-public class RealmManager implements Manager {
+public class RealmManager {
 
-    private SecurityManager securityManager;
     private final Map<String, Realm> REALMS = Maps.newHashMap();
+	private SecurityProperties properties;
+	private InnerCacheManager cacheManager;
+	private ListenerManager listenerManager;
+	private IAccountProvider accountProvider;
+	private IEncryptProvider encryptProvider;
+	private PasswdRetryRecordDao passwdRetryRecordDao;
+    
 
-    public void initialize(SecurityManager securityManager) {
-        this.securityManager = securityManager;
-        SecurityProperties properties = this.securityManager.getProperties();
-        InnerCacheManager cacheManager = this.securityManager.getCacheManager();
+    public void initialize(SecurityProperties properties
+    					,InnerCacheManager cacheManager
+			    		,ListenerManager listenerManager
+			    		,IAccountProvider accountProvider
+			    		,IEncryptProvider encryptProvider
+			    		,List<Realm> customRealms) {
+    	
+    	this.properties = properties;
+    	this.cacheManager = cacheManager;
+    	this.listenerManager = listenerManager;
+    	this.accountProvider = accountProvider;
+    	this.encryptProvider = encryptProvider;
+
         String cacheName = properties.getPasswdRetryRecordCacheName();
         Long timeout = properties.getPasswdRetryRecordCacheTimeout();
         InnerCache cache = cacheManager.getCache(cacheName, timeout);
-        PasswdRetryRecordDao passwdRetryRecordDao = new PasswdRetryRecordDao(cache);
+        this.passwdRetryRecordDao = new PasswdRetryRecordDao(cache);
 
         UsernamePasswordRealm usernamePasswordRealm =  new UsernamePasswordRealm();
         UsernameRealm usernameRealm =  new UsernameRealm();
         REALMS.put(usernamePasswordRealm.getSupportRequestClass().getName(), usernamePasswordRealm);
         REALMS.put(usernameRealm.getSupportRequestClass().getName(), usernameRealm);
 
-        this.securityManager.getCustomRealms().forEach(custom -> {
+        customRealms.forEach(custom -> {
             String support = custom.getSupportRequestClass().getName();
             REALMS.put(support, custom);
         });
 
         REALMS.forEach((name, custom)->{
             if(AbstractRealm.class.isAssignableFrom(custom.getClass()) ){
-                ((AbstractRealm)custom).setSecurityManager(this.securityManager);
+            	AbstractRealm abstractRealm = ((AbstractRealm)custom);
+            	abstractRealm.setListenerManager(this.listenerManager);
+            	abstractRealm.setProperties(this.properties);
+            	abstractRealm.setAccountProvider(this.accountProvider);
+            	abstractRealm.setEncryptProvider(this.encryptProvider);
+            	abstractRealm.setPasswdRetryRecordDao(this.passwdRetryRecordDao);
             }
             log.info("初始化Realm，名称：{}， 类：{}", name, custom.getClass().getName());
         });
-
     }
 
     public AuthenticationInfo authenticate(AuthRequest request) throws UnauthorizedException {
@@ -81,10 +102,9 @@ public class RealmManager implements Manager {
             throw new IllegalStateException("配置错误，没有支持" + request.getClass()+" 类型请求的Realm");
         }
 
-        SecurityProperties properties = this.securityManager.getProperties();
         AuthenticationInfo authenticationInfo  = realm.doAuthenticate(request);
         if(Objects.isNull(authenticationInfo)){
-            throw new UnauthorizedException(properties.getLoginErrorTips());
+            throw new UnauthorizedException(this.properties.getLoginErrorTips());
         }
 
         return authenticationInfo;

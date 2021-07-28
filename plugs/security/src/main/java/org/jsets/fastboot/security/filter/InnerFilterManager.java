@@ -23,8 +23,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import com.google.common.collect.Sets;
-import org.jsets.fastboot.security.Manager;
-import org.jsets.fastboot.security.SecurityManager;
 import org.jsets.fastboot.security.config.AuthRuleConfig;
 import org.jsets.fastboot.security.model.AuthRule;
 import org.jsets.fastboot.security.util.WebUtils;
@@ -33,9 +31,12 @@ import com.google.common.collect.Maps;
 import org.jsets.fastboot.common.util.CollectionUtils;
 import org.jsets.fastboot.common.util.StringUtils;
 import org.jsets.fastboot.security.IAuthRuleProvider;
+import org.jsets.fastboot.security.IAuthenticator;
+import org.jsets.fastboot.security.IAuthorizer;
+import org.jsets.fastboot.security.ICaptchaProvider;
 import org.jsets.fastboot.security.config.SecurityProperties;
 import org.jsets.fastboot.security.filter.InnerFilterRule.FilterProps;
-
+import org.jsets.fastboot.security.listener.ListenerManager;
 import lombok.extern.slf4j.Slf4j;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -47,27 +48,37 @@ import javax.servlet.http.HttpServletResponse;
  * @date 2021.07.04 23:26
  */
 @Slf4j
-public class InnerFilterManager implements Manager {
-	
-	private static final String FILTER_ANON = "anon";
-	private static final String FILTER_LOGIN = "login";
-	private static final String FILTER_LOGOUT = "logout";
-	private static final String FILTER_TOKEN = "token";
-	private static final String FILTER_ROLES = "roles";
-	private static final String FILTER_PERMS = "perms";
-	
+public class InnerFilterManager {
+
 	private final List<InnerFilterRule> RULES = Lists.newLinkedList();
 	private final Map<String, InnerFilter> FILTERS = Maps.newHashMap();
 	private final Set<String> filterPlaceholders = Sets.newHashSet();
 
-	private String loginPath;// 登录地址
-	private SecurityManager securityManager;
 	private SecurityProperties properties;
+	private IAuthenticator authenticator;
+	private IAuthorizer authorizer;
+	private IAuthRuleProvider authRuleProvider;
+	private ICaptchaProvider captchaProvider;
+	private ListenerManager listenerManager;
+	private Map<String, InnerFilter> customFilters;
+	private String loginPath;// 登录地址
 
-	@Override
-	public void initialize(SecurityManager securityManager) {
-		this.securityManager = securityManager;
-		this.properties = this.securityManager.getProperties();
+
+	public void initialize(SecurityProperties properties
+							,IAuthenticator authenticator
+							,IAuthorizer authorizer
+							,IAuthRuleProvider authRuleProvider
+							,ICaptchaProvider captchaProvider
+							,ListenerManager listenerManager
+							,Map<String, InnerFilter> customFilters) {
+		
+		this.properties = properties;
+		this.authenticator = authenticator;
+		this.authorizer = authorizer;
+		this.authRuleProvider = authRuleProvider;
+		this.captchaProvider = captchaProvider;
+		this.listenerManager = listenerManager;
+		this.customFilters = customFilters;
 		this.buildFilterRules();
 		this.buildFilter();
 	}
@@ -79,14 +90,13 @@ public class InnerFilterManager implements Manager {
 			filterRule.setAccessPath(accessPath);
 			filterRule.setIgnore(true);
 			InnerFilterRule.FilterProps fp = new InnerFilterRule.FilterProps();
-			fp.setName(FILTER_ANON);
+			fp.setName(SecurityProperties.FILTER_ANON);
 			filterRule.getFilters().add(fp);
 			this.RULES.add(filterRule);
 		}
 		
-		IAuthRuleProvider authRuleProvider = this.securityManager.getAuthRuleProvider();
-		if (Objects.nonNull(authRuleProvider)) {
-			List<AuthRule> list = authRuleProvider.loadAuthRuleList();
+		if (Objects.nonNull(this.authRuleProvider)) {
+			List<AuthRule> list = this.authRuleProvider.loadAuthRuleList();
 			for (AuthRule rule : list) {
 				if (StringUtils.isEmpty(rule.getPath())) {
 					throw new IllegalArgumentException("authRuleProvider提供的鉴权规则[" + rule + "]格式错误，path不能为空");
@@ -151,17 +161,17 @@ public class InnerFilterManager implements Manager {
 		
 		if (StringUtils.notEmpty(authRule.getRole())) {
 			InnerFilterRule.FilterProps fp = new InnerFilterRule.FilterProps();
-			fp.setName(FILTER_ROLES);
+			fp.setName(SecurityProperties.FILTER_ROLES);
 			fp.getProps().add(authRule.getRole());
 			filterRule.getFilters().add(fp);
-			this.filterPlaceholders.add(FILTER_ROLES);
+			this.filterPlaceholders.add(SecurityProperties.FILTER_ROLES);
 		}
 		if (StringUtils.notEmpty(authRule.getPermission())) {
 			InnerFilterRule.FilterProps fp = new InnerFilterRule.FilterProps();
-			fp.setName(FILTER_PERMS);
+			fp.setName(SecurityProperties.FILTER_PERMS);
 			fp.getProps().add(authRule.getPermission());
 			filterRule.getFilters().add(fp);
-			this.filterPlaceholders.add(FILTER_PERMS);
+			this.filterPlaceholders.add(SecurityProperties.FILTER_PERMS);
 		}
 		return filterRule;
 	}
@@ -169,14 +179,14 @@ public class InnerFilterManager implements Manager {
 	private void updateInnerFilterRule(AuthRule authRule, InnerFilterRule filterRule) {
 		if (StringUtils.notEmpty(authRule.getRole())) {
 			for(FilterProps filterProp : filterRule.getFilters()) {
-				if(FILTER_ROLES.equals(filterProp.getName())) {
+				if(SecurityProperties.FILTER_ROLES.equals(filterProp.getName())) {
 					filterProp.getProps().add(authRule.getRole());
 				}
 			}
 		}
 		if (StringUtils.notEmpty(authRule.getPermission())) {
 			for(FilterProps filterProp : filterRule.getFilters()) {
-				if(FILTER_PERMS.equals(filterProp.getName())) {
+				if(SecurityProperties.FILTER_PERMS.equals(filterProp.getName())) {
 					filterProp.getProps().add(authRule.getPermission());
 				}
 			}
@@ -196,12 +206,12 @@ public class InnerFilterManager implements Manager {
 				fp.getProps().addAll(t.getProps());
 			}
 			filterRule.getFilters().add(fp);
-			if (FILTER_ANON.equals(t.getName())) {
+			if (SecurityProperties.FILTER_ANON.equals(t.getName())) {
 				filterRule.setIgnore(true);
 			} else {
 				this.filterPlaceholders.add(t.getName());
 			}
-			if(FILTER_LOGIN.equals(t.getName())){
+			if(SecurityProperties.FILTER_LOGIN.equals(t.getName())){
 				this.loginPath = config.getAccessPath();
 			}
 		});
@@ -211,43 +221,52 @@ public class InnerFilterManager implements Manager {
 	private void buildFilter() {
 		this.filterPlaceholders.forEach(name -> {
 			switch (name) {
-				case FILTER_ROLES:
+				case SecurityProperties.FILTER_ROLES:
 					RoleAuthzFilter roleAuthzFilter = new RoleAuthzFilter();
-					FILTERS.put(FILTER_ROLES, roleAuthzFilter);
+					FILTERS.put(SecurityProperties.FILTER_ROLES, roleAuthzFilter);
 					break;
-				case FILTER_PERMS:
+				case SecurityProperties.FILTER_PERMS:
 					PermAuthzFilter permAuthzFilter = new PermAuthzFilter();
-					FILTERS.put(FILTER_PERMS, permAuthzFilter);
+					FILTERS.put(SecurityProperties.FILTER_PERMS, permAuthzFilter);
 					break;
-				case FILTER_LOGIN:
+				case SecurityProperties.FILTER_LOGIN:
 					LoginFilter loginFilter = new LoginFilter();
-					FILTERS.put(FILTER_LOGIN, loginFilter);
+					FILTERS.put(SecurityProperties.FILTER_LOGIN, loginFilter);
 					break;
-				case FILTER_LOGOUT:
+				case SecurityProperties.FILTER_LOGOUT:
 					LogoutFilter logoutFilter = new LogoutFilter();
-					FILTERS.put(FILTER_LOGOUT, logoutFilter);
+					FILTERS.put(SecurityProperties.FILTER_LOGOUT, logoutFilter);
 					break;
-				case FILTER_TOKEN:
+				case SecurityProperties.FILTER_TOKEN:
 					TokenFilter tokenFilter = new TokenFilter();
-					FILTERS.put(FILTER_TOKEN, tokenFilter);
+					FILTERS.put(SecurityProperties.FILTER_TOKEN, tokenFilter);
 					break;
 			}
 		});
 
-		if (CollectionUtils.notEmpty(this.securityManager.getCustomFilters())) {
-			this.securityManager.getCustomFilters().forEach((name, filter) -> {
+		if (CollectionUtils.notEmpty(this.customFilters)) {
+			this.customFilters.forEach((name, filter) -> {
 				FILTERS.put(name, filter);
 			});
 		}
 
+		if(FILTERS.size()==0) {
+			FILTERS.put(SecurityProperties.FILTER_DEFAULT, new DefaultFilter());
+		}
+		
 		FILTERS.forEach((name, filter)->{
 			if(AbstractInnerFilter.class.isAssignableFrom(filter.getClass()) ){
 				AbstractInnerFilter abstractInnerFilter = ((AbstractInnerFilter)filter);
-				abstractInnerFilter.setSecurityManager(this.securityManager);
+				abstractInnerFilter.setProperties(this.properties);
+				abstractInnerFilter.setAuthenticator(this.authenticator);
+				abstractInnerFilter.setAuthorizer(this.authorizer);
+				abstractInnerFilter.setCaptchaProvider(this.captchaProvider);
+				abstractInnerFilter.setListenerManager(this.listenerManager);
 				abstractInnerFilter.setLoginPath(this.loginPath);
 			}
 			log.info("初始化过滤器，名称：{}， 类：{}", name, filter.getClass().getName());
 		});
+		
 	}
 
 	public boolean doInnerFilterChain(HttpServletRequest httpRequest, HttpServletResponse httpResponse) throws Exception {
@@ -272,7 +291,7 @@ public class InnerFilterManager implements Manager {
 
 		if (matched.isIgnore()) {
 			if(log.isInfoEnabled()) {
-				log.info("method:{} ,uri: {} ,filter :{}", matched.getHttpMethod()==null?"*":matched.getHttpMethod(), servletPath, FILTER_ANON);
+				log.info("method:{} ,uri: {} ,filter :{}", matched.getHttpMethod()==null?"*":matched.getHttpMethod(), servletPath, SecurityProperties.FILTER_ANON);
 			}
 			return true;
 		}
@@ -299,6 +318,8 @@ public class InnerFilterManager implements Manager {
 
 		return false;
 	}
+	
+	
 
 
 }

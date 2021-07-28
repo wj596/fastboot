@@ -21,6 +21,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.jsets.fastboot.security.IAccountProvider;
 import org.jsets.fastboot.security.IAuthRuleProvider;
+import org.jsets.fastboot.security.IAuthenticator;
+import org.jsets.fastboot.security.IAuthorizer;
 import org.jsets.fastboot.security.ICaptchaProvider;
 import org.jsets.fastboot.security.IEncryptProvider;
 import org.jsets.fastboot.security.filter.InnerFilter;
@@ -38,6 +40,8 @@ public class SecurityCustomizer {
 	private IEncryptProvider encryptProvider;
 	private ICaptchaProvider captchaProvider;
 	private IAuthRuleProvider authRuleProvider;
+	private IAuthenticator authenticator;
+	private IAuthorizer authorizer;
 
 	private Map<String, InnerFilter> filters = Maps.newLinkedHashMap();
 	private List<Realm> realms = Lists.newLinkedList();
@@ -52,7 +56,7 @@ public class SecurityCustomizer {
 	public void setAccountProvider(IAccountProvider accountProvider) {
 		this.accountProvider = accountProvider;
 	}
-
+	
 	public IEncryptProvider getEncryptProvider() {
 		return encryptProvider;
 	}
@@ -114,5 +118,21 @@ public class SecurityCustomizer {
 
 	public void setPasswordRetryListener(PasswordRetryListener passwordRetryListener) {
 		this.passwordRetryListener = passwordRetryListener;
+	}
+
+	public IAuthenticator getAuthenticator() {
+		return authenticator;
+	}
+
+	public void setAuthenticator(IAuthenticator authenticator) {
+		this.authenticator = authenticator;
+	}
+
+	public IAuthorizer getAuthorizer() {
+		return authorizer;
+	}
+
+	public void setAuthorizer(IAuthorizer authorizer) {
+		this.authorizer = authorizer;
 	}
 }

@@ -18,7 +18,6 @@
 package org.jsets.fastboot.security.auth;
 
 import lombok.Data;
-import org.springframework.http.HttpStatus;
 import java.io.Serializable;
 
 /**
@@ -32,28 +31,31 @@ import java.io.Serializable;
 public class AuthResponse implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	
-	private Integer status; //业务状态
+
+	private static final Integer SUCCEED = 0;
+	private static final Integer FAILED = 1;
+
+	private Integer code; //编码
     private String message;//消息
     private String accessToken;//访问令牌
     private String refreshToken;//刷新令牌
 
     public static AuthResponse succeed(){
         AuthResponse ar = new AuthResponse();
-        ar.status = HttpStatus.OK.value();
+        ar.setCode(SUCCEED);
         return ar;
     }
 
     public static AuthResponse succeed(String message){
         AuthResponse ar = new AuthResponse();
-        ar.status = HttpStatus.OK.value();
+        ar.setCode(SUCCEED);
         ar.setMessage(message);
         return ar;
     }
 
     public static AuthResponse succeed(String message, String accessToken){
         AuthResponse ar = new AuthResponse();
-        ar.status = HttpStatus.OK.value();
+        ar.setCode(SUCCEED);
         ar.setMessage(message);
         ar.setAccessToken(accessToken);
         return ar;
@@ -61,11 +63,9 @@ public class AuthResponse implements Serializable {
 
     public static AuthResponse failed(Integer status, String message){
         AuthResponse ar = new AuthResponse();
-        ar.status = status;
+        ar.setCode(FAILED);
         ar.setMessage(message);
         return ar;
     }
-
-
 
 }

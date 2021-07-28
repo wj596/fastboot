@@ -3,7 +3,6 @@ package org.jsets.fastboot.service.system.impl;
 import org.jsets.fastboot.model.entity.system.User;
 import org.jsets.fastboot.model.enums.system.UserStatus;
 import org.jsets.fastboot.security.SecurityUtils;
-import org.jsets.fastboot.security.annotation.Authenticated;
 import org.jsets.fastboot.security.exception.UnauthorizedException;
 import org.jsets.fastboot.security.model.IAccount;
 import java.util.Optional;

@@ -17,7 +17,6 @@
  */
 package org.jsets.fastboot.security.session;
 
-import org.jsets.fastboot.security.Manager;
 import org.jsets.fastboot.security.auth.AuthRequest;
 import org.jsets.fastboot.security.exception.UnauthorizedException;
 import java.util.Optional;
@@ -30,7 +29,7 @@ import java.util.Set;
  * @date 2021.07.09 14:23
  * @since 0.1
  */
-public interface SessionManager extends Manager {
+public interface SessionManager {
 
     Session create(AuthRequest authRequest);
 

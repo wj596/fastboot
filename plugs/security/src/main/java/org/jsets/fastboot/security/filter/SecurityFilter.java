@@ -23,6 +23,7 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.jsets.fastboot.security.SecurityUtils;
 import org.jsets.fastboot.common.util.JsonUtils;
 import org.jsets.fastboot.security.auth.AuthResponse;
 import org.jsets.fastboot.security.exception.UnauthorizedException;
@@ -44,18 +45,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class SecurityFilter extends OncePerRequestFilter {
 
-	private final InnerFilterManager innerFilterManager;
-
-	public SecurityFilter(InnerFilterManager innerFilterManager) {
-		this.innerFilterManager = innerFilterManager;
-	}
-
 	@Override
-	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-			throws ServletException, IOException {
+	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 		boolean doContinue = false;
 		try {
-			doContinue = this.innerFilterManager.doInnerFilterChain(request, response);
+			doContinue = SecurityUtils.doInnerFilterChain(request, response);
 		} catch (Exception e) {
 			this.handleException(response, e);
 		}

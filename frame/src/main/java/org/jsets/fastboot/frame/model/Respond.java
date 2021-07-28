@@ -15,46 +15,40 @@ public class Respond extends BaseResp{
 
 	public static Respond ok() {
 		Respond baseReturn = new Respond();
-		baseReturn.setStatus(HttpStatus.OK);
-		baseReturn.setSucceed(SUCCEED);
+		baseReturn.setCode(RespCode.SUCCEED);
 		return baseReturn;
 	}
 
 	public static Respond ok(String message) {
 		Respond baseReturn = new Respond();
-		baseReturn.setStatus(HttpStatus.OK);
-		baseReturn.setSucceed(SUCCEED);
+		baseReturn.setCode(RespCode.SUCCEED);
 		baseReturn.setMessage(message);
 		return baseReturn;
 	}
 
 	public static Respond ok(HttpStatus status, String message) {
 		Respond baseReturn = new Respond();
-		baseReturn.setStatus(status);
-		baseReturn.setSucceed(SUCCEED);
+		baseReturn.setCode(RespCode.SUCCEED);
 		baseReturn.setMessage(message);
 		return baseReturn;
 	}
 
 	public static Respond fail() {
 		Respond baseReturn = new Respond();
-		baseReturn.setSucceed(FAILED);
-		baseReturn.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+		baseReturn.setCode(RespCode.FAILED);
 		return baseReturn;
 	}
 
 	public static Respond fail(String message) {
 		Respond baseReturn = new Respond();
-		baseReturn.setSucceed(FAILED);
-		baseReturn.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+		baseReturn.setCode(RespCode.FAILED);
 		baseReturn.setMessage(message);
 		return baseReturn;
 	}
 
 	public static Respond fail(HttpStatus status, String message) {
 		Respond baseReturn = new Respond();
-		baseReturn.setSucceed(FAILED);
-		baseReturn.setStatus(status);
+		baseReturn.setCode(RespCode.FAILED);
 		baseReturn.setMessage(message);
 		return baseReturn;
 	}

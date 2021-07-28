@@ -20,7 +20,7 @@ package org.jsets.fastboot.security.aop;
 import java.lang.annotation.Annotation;
 import org.aspectj.lang.JoinPoint;
 import org.jsets.fastboot.common.util.StringUtils;
-import org.jsets.fastboot.security.SecurityManager;
+import org.jsets.fastboot.security.SecurityUtils;
 import org.jsets.fastboot.security.annotation.HasAnyPermissions;
 import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
@@ -28,8 +28,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class HasAnyPermissionsMethodInterceptor extends AnnotationMethodInterceptor {
 
-	public HasAnyPermissionsMethodInterceptor(SecurityManager securityManager, Class<? extends Annotation> annotationClass) {
-		super(securityManager, annotationClass);
+	public HasAnyPermissionsMethodInterceptor(Class<? extends Annotation> annotationClass) {
+		super(annotationClass);
 	}
 
 	@Override
@@ -44,7 +44,7 @@ public class HasAnyPermissionsMethodInterceptor extends AnnotationMethodIntercep
 		
 		HasAnyPermissions hap = (HasAnyPermissions)ann;
 		String[] permissions = hap.value();
-		boolean allowed = this.getSecurityManager().isPermittedAny(Sets.newHashSet(permissions));
+		boolean allowed = SecurityUtils.isPermittedAny(Sets.newHashSet(permissions));
 		if(log.isInfoEnabled()) {
 			log.info("访问方法["+ this.getInvokeMethod(joinPoint) +"]需要权限["+ StringUtils.join(permissions) +"]，鉴权结果["+ allowed +"]");
 		}

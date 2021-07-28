@@ -19,6 +19,11 @@ package org.jsets.fastboot.security.filter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.jsets.fastboot.security.exception.ForbiddenException;
+
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.Set;
 
 /**
@@ -27,15 +32,28 @@ import java.util.Set;
  * @Author wangjie
  * @date 2021.07.05 14:10
  */
+@Slf4j
 public class PermAuthzFilter extends AbstractInnerFilter {
 
     @Override
     public boolean isAccessAllowed(HttpServletRequest request, HttpServletResponse response, Set<String> props) throws Exception {
-        return false;
+		if (this.isLoginRequest(request)) {
+			return true;
+		}
+		
+		String token = this.checkAndGetAuthorization(request);
+		this.getAuthenticator().authenticate(token);
+        if(this.getAuthorizer().isPermittedAny(props)) {
+			log.info("访问路径：{}，需要权限：{}，允许访问", request.getServletPath(), props);
+			return true;
+		}
+		
+		log.info("访问路径：{}，需要权限：{}，拒绝访问", request.getServletPath(), props);
+        throw new ForbiddenException(this.getProperties().getForbiddenTips());
     }
 
     @Override
     public boolean onAccessDenied(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        return false;
+        return true;
     }
 }

@@ -18,7 +18,6 @@
 package org.jsets.fastboot.security.filter;
 
 import org.jsets.fastboot.security.auth.AuthResponse;
-import org.jsets.fastboot.security.config.SecurityProperties;
 import org.springframework.http.HttpStatus;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -34,8 +33,8 @@ public class LogoutFilter extends AbstractInnerFilter {
     @Override
     public boolean onAccessDenied(HttpServletRequest servletRequest, HttpServletResponse servletResponse) throws Exception {
         String token = this.checkAndGetAuthorization(servletRequest);
-        this.getSecurityManager().logout(token);
-        AuthResponse authResponse = AuthResponse.succeed(this.getSecurityManager().getProperties().getLogoutSucceedTips());
+        this.getAuthenticator().logout(token);
+        AuthResponse authResponse = AuthResponse.succeed(this.getProperties().getLogoutSucceedTips());
         writeAuthResponse(servletResponse, HttpStatus.OK.value(), authResponse);
         return false;
     }

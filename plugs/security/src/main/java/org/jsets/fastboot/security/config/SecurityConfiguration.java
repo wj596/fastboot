@@ -65,10 +65,10 @@ public class SecurityConfiguration {
 	
 	@Bean
 	@ConditionalOnProperty(prefix = "fastboot.security", name = "captcha-enabled", havingValue = "true")
-	public FilterRegistrationBean<CaptchaFilter> captchaFilterRegister(SecurityManager securityManager) {
+	public FilterRegistrationBean<CaptchaFilter> captchaFilterRegister() {
 		log.info("实例化CaptchaFilter");
 		FilterRegistrationBean<CaptchaFilter> registration = new FilterRegistrationBean<CaptchaFilter>();
-		CaptchaFilter captchaFilter = new CaptchaFilter(securityManager.getCaptchaProvider());
+		CaptchaFilter captchaFilter = new CaptchaFilter();
 		registration.setFilter(captchaFilter);
 		registration.addUrlPatterns("/captcha");
 		registration.setName("captchaFilter");
@@ -77,9 +77,9 @@ public class SecurityConfiguration {
 	}
 	
 	@Bean
-	public FilterRegistrationBean<SecurityFilter> securityFilterRegister(SecurityManager securityManager) {
+	public FilterRegistrationBean<SecurityFilter> securityFilterRegister() {
 		FilterRegistrationBean<SecurityFilter> registration = new FilterRegistrationBean<SecurityFilter>();
-		SecurityFilter securityFilter = new SecurityFilter(securityManager.getFilterManager());
+		SecurityFilter securityFilter = new SecurityFilter();
 		registration.setFilter(securityFilter);
 		registration.addUrlPatterns("/*");
 		registration.setName("securityFilter");
@@ -88,8 +88,9 @@ public class SecurityConfiguration {
 	}
 	
 	@Bean
-	public AnnotationAuthAspect annotationAuthAspect(SecurityManager securityManager) {
-		return new AnnotationAuthAspect(securityManager);
+	@ConditionalOnProperty(prefix = "fastboot.security", name = "annotation-enabled", havingValue = "true")
+	public AnnotationAuthAspect annotationAuthAspect() {
+		return new AnnotationAuthAspect();
 	}
 
 }

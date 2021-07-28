@@ -39,14 +39,14 @@ public class RoleAuthzFilter extends AbstractInnerFilter {
 		}
 		
 		String token = this.checkAndGetAuthorization(request);
-		this.getSecurityManager().authenticate(token);
-        if(this.getSecurityManager().hasAnyRole(props)) {
+		this.getAuthenticator().authenticate(token);
+        if(this.getAuthorizer().hasAnyRole(props)) {
 			log.info("访问路径：{}，需要角色：{}，允许访问", request.getServletPath(), props);
 			return true;
 		}
 		
 		log.info("访问路径：{}，需要角色：{}，拒绝访问", request.getServletPath(), props);
-        throw new ForbiddenException(this.getSecurityManager().getProperties().getForbiddenTips());
+        throw new ForbiddenException(this.getProperties().getForbiddenTips());
     }
 
     @Override

@@ -29,12 +29,11 @@ import java.util.Base64;
 import java.util.Map;
 import org.jsets.fastboot.common.util.JsonUtils;
 import org.jsets.fastboot.common.util.StringUtils;
-import org.jsets.fastboot.security.ICaptchaProvider;
+import org.jsets.fastboot.security.SecurityUtils;
 import org.jsets.fastboot.security.util.WebUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.filter.OncePerRequestFilter;
 import com.google.common.collect.Maps;
-
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -43,18 +42,12 @@ public class CaptchaFilter extends OncePerRequestFilter {
 	private static final int ACCESS_CONTROL_MAX_AGE = 20*24*60*60;
 	private static final String CAPTCHA_KEY = "captchaKey";
 	private static final String CAPTCHA_IMAGE_BASE64 = "captchaImageBase64";
-	
-	private final ICaptchaProvider captchaProvider;
 
-	public CaptchaFilter(ICaptchaProvider captchaProvider) {
-		this.captchaProvider = captchaProvider;
-	}
-	
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 		log.info("CaptchaFilter:{}", request.getServletPath());
 		String captchaKey = StringUtils.getUUID();
-		BufferedImage image = captchaProvider.generateCaptcha(captchaKey);
+		BufferedImage image = SecurityUtils.generateCaptcha(captchaKey);
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
 		ImageIO.write(image, "jpeg", stream);
 		String captchaImageBase64 = "data:image/jpeg;base64,"+Base64.getEncoder().encodeToString(stream.toByteArray());

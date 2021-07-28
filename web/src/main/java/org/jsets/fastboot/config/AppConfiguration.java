@@ -21,7 +21,7 @@ public class AppConfiguration{
     @Bean
     public SecurityCustomizer securityCustomizer() {
     	SecurityCustomizer customizer = new SecurityCustomizer();
-    	customizer.setAccountProvider(userService);
+    	customizer.setAccountProvider(this.userService);
         return customizer;
     }
 	

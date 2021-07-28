@@ -21,12 +21,12 @@ import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
-import org.jsets.fastboot.security.SecurityManager;
 
 @Aspect
 public class AnnotationAuthAspect {
 	
     private static final String POINTCUT_EXPRESSION = // 切入点表达式
+    		 "execution(@org.jsets.fastboot.security.annotation.HMACAuthenticate * *(..)) || " +
              "execution(@org.jsets.fastboot.security.annotation.Authenticated * *(..)) || " +
              "execution(@org.jsets.fastboot.security.annotation.HasRole * *(..)) || " +
              "execution(@org.jsets.fastboot.security.annotation.HasPermission * *(..)) || " +
@@ -35,8 +35,8 @@ public class AnnotationAuthAspect {
 	
     private final AnnotationAuthInterceptor interceptor;
 
-    public AnnotationAuthAspect(SecurityManager securityManager) {
-		this.interceptor = new AnnotationAuthInterceptor(securityManager);
+    public AnnotationAuthAspect() {
+		this.interceptor = new AnnotationAuthInterceptor();
 	}
 
 	@Pointcut(POINTCUT_EXPRESSION)

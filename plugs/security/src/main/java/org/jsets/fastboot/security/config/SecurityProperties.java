@@ -33,6 +33,14 @@ import lombok.Data;
 @ConfigurationProperties(prefix = "fastboot.security", ignoreUnknownFields = true, ignoreInvalidFields = true)
 public class SecurityProperties {
 	
+	public static final String FILTER_ANON = "anon";
+	public static final String FILTER_LOGIN = "login";
+	public static final String FILTER_LOGOUT = "logout";
+	public static final String FILTER_TOKEN = "token";
+	public static final String FILTER_ROLES = "roles";
+	public static final String FILTER_PERMS = "perms";
+	public static final String FILTER_DEFAULT = "default";
+	
 	public static final char COMMA_SEPARATOR = ','; //逗号分隔符
 	public static final String URL_FILTER_SEPARATOR = "-->"; //URL过滤器分隔符
 	public static final String METHOD_PATH_SEPARATOR = ":"; //HTTP方法和路径分割符
@@ -54,6 +62,12 @@ public class SecurityProperties {
 	public static final long PASSWD_RETRY_RECORD_CACHE_TIMEOUT = 86400l;
 	// 验证码缓存时间，默认60 秒
 	public static final long CAPTCHA_CACHE_TIMEOUT = 60l;
+	// HMAC签名有效期，默认60 秒
+	public static final long HMAC_SIGN_TIMEOUT = 60l;
+	// HMAC签名盐
+	public static final String HMAC_SIGN_SALT = "fastboot";
+
+	
 
 	// 提示信息
 	public static final String TIPS_USERNAME_NOT_BLANK = "账号不能为空";
@@ -71,6 +85,8 @@ public class SecurityProperties {
 	public static final String TIPS_LOGOUT_SUCCEED = "登出成功";
 	public static final String TIPS_FORBIDDEN = "权限不足";
 	public static final String TIPS_UNAUTHORIZED = "未认证";
+	public static final String HMAC_VALIDATE_INVALID_TIPS = "HMAC签名验证失败";
+	
 
 	// 无需认证和授权即可访问的路径
 	public static final List<String> IGNORED_AUTH_PATHS = Arrays.asList(
@@ -98,14 +114,19 @@ public class SecurityProperties {
 	private String logoutSucceedTips = TIPS_LOGOUT_SUCCEED;// 登出成功提示
 	private String forbiddenTips = TIPS_FORBIDDEN;// 权限不足提示
 	private String unauthorizedTips = TIPS_UNAUTHORIZED;// 未认证提示
-	
-
+	private String hmacValidateInvalidTips = HMAC_VALIDATE_INVALID_TIPS;// hmac签名验证失败
 	
 	private boolean corsEnabled;// 是否允许跨域
 	private boolean captchaEnabled;// 是否启用验证码
+	private boolean annotationEnabled;// 启用注解鉴权
+	
 	private Long sessionTimeout = SESSION_TIMEOUT;// 会话有效期,单位秒
 	private String tokenSignKey;// 令牌签名秘钥
 
+	private String HMACSignKey;// HMAC签名秘钥
+	private Long HMACSignTimeout = HMAC_SIGN_TIMEOUT;// HMAC签名有效期
+	private String HMACSignSalt = HMAC_SIGN_SALT;// HMAC签名盐
+	
 	private String sessionCacheName = SESSION_CACHE_NAME;// 会话缓存名称
 	private String passwdRetryRecordCacheName = PASSWD_RETRY_RECORD_CACHE_NAME;// 密码重试记录缓存名称
 	private Long passwdRetryRecordCacheTimeout = PASSWD_RETRY_RECORD_CACHE_TIMEOUT;// 密码重试记录缓存超时间,单位秒

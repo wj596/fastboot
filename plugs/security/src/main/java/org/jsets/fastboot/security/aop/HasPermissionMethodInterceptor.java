@@ -20,14 +20,15 @@ package org.jsets.fastboot.security.aop;
 import java.lang.annotation.Annotation;
 import org.aspectj.lang.JoinPoint;
 import org.jsets.fastboot.security.SecurityManager;
+import org.jsets.fastboot.security.SecurityUtils;
 import org.jsets.fastboot.security.annotation.HasPermission;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class HasPermissionMethodInterceptor extends AnnotationMethodInterceptor {
 
-	public HasPermissionMethodInterceptor(SecurityManager securityManager, Class<? extends Annotation> annotationClass) {
-		super(securityManager, annotationClass);
+	public HasPermissionMethodInterceptor(Class<? extends Annotation> annotationClass) {
+		super(annotationClass);
 	}
 
 	@Override
@@ -42,7 +43,7 @@ public class HasPermissionMethodInterceptor extends AnnotationMethodInterceptor 
 		
 		HasPermission hp = (HasPermission)ann;
 		String permission = hp.value();
-		boolean allowed = this.getSecurityManager().isPermitted(permission);
+		boolean allowed = SecurityUtils.isPermitted(permission);
 		if(log.isInfoEnabled()) {
 			log.info("访问方法["+ this.getInvokeMethod(joinPoint) +"]需要权限["+ permission +"]，鉴权结果["+ allowed +"]");
 		}

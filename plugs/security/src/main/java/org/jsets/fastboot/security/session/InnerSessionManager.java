@@ -18,7 +18,6 @@
 package org.jsets.fastboot.security.session;
 
 import org.jsets.fastboot.common.util.StringUtils;
-import org.jsets.fastboot.security.SecurityManager;
 import org.jsets.fastboot.security.auth.AuthRequest;
 import org.jsets.fastboot.security.cache.InnerCache;
 import org.jsets.fastboot.security.cache.InnerCacheManager;
@@ -38,14 +37,11 @@ import java.util.Set;
 @Slf4j
 public class InnerSessionManager implements SessionManager {
 
-	private SecurityManager securityManager;
 	private SecurityProperties properties;
 	private SessionDao sessionDao;
 	
-    public void initialize(SecurityManager securityManager){
-    	this.securityManager = securityManager;
-		this.properties = this.securityManager.getProperties();
-    	InnerCacheManager cacheManager = this.securityManager.getCacheManager();
+    public void initialize(SecurityProperties properties,InnerCacheManager cacheManager){
+		this.properties = properties;
     	InnerCache cache = cacheManager.getCache(this.properties.getSessionCacheName(), this.properties.getSessionTimeout());
     	sessionDao = new SessionDao(cache);
     }

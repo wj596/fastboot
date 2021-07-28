@@ -24,7 +24,6 @@ public class UserController extends BaseController{
     @Autowired
     private IUserService service;
 
-    
 	@ApiOperation("根据ID获取用户信息")
 	@ApiImplicitParams({
 		@ApiImplicitParam(name="id", value="主键", required=true ,paramType="path")

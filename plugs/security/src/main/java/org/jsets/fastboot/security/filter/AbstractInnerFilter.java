@@ -20,9 +20,13 @@ package org.jsets.fastboot.security.filter;
 import lombok.extern.slf4j.Slf4j;
 import org.jsets.fastboot.common.util.JsonUtils;
 import org.jsets.fastboot.common.util.StringUtils;
-import org.jsets.fastboot.security.SecurityManager;
+import org.jsets.fastboot.security.IAuthenticator;
+import org.jsets.fastboot.security.IAuthorizer;
+import org.jsets.fastboot.security.ICaptchaProvider;
 import org.jsets.fastboot.security.auth.AuthResponse;
+import org.jsets.fastboot.security.config.SecurityProperties;
 import org.jsets.fastboot.security.exception.UnauthorizedException;
+import org.jsets.fastboot.security.listener.ListenerManager;
 import org.jsets.fastboot.security.util.WebUtils;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -37,46 +41,87 @@ import javax.servlet.http.HttpServletResponse;
 @Slf4j
 public abstract class AbstractInnerFilter implements InnerFilter {
 
-    protected static final String HEADER_KEY_AUTHORIZATION = "Authorization";
-    private SecurityManager securityManager;
-    private String loginPath;
-    
-    protected boolean isLoginRequest(HttpServletRequest request) {
-        if(!WebUtils.isPostMethod(request)){
-            return false;
-        }
-        if(StringUtils.isBlank(this.getLoginPath())) {
-            return false;
-        }
-        return WebUtils.pathMatch(this.getLoginPath(), request.getServletPath());
-    }
+	protected static final String HEADER_KEY_AUTHORIZATION = "Authorization";
 
-    protected String checkAndGetAuthorization(HttpServletRequest request) throws UnauthorizedException {
-        String authorization = request.getHeader(HEADER_KEY_AUTHORIZATION);
-        if(StringUtils.isBlank(authorization)) {
-        	log.warn(this.securityManager.getProperties().getTokenBlankTips());
-            throw new UnauthorizedException(this.getSecurityManager().getProperties().getTokenBlankTips());
-        }
-        return authorization;
-    }
+	private SecurityProperties properties;
+	private IAuthenticator authenticator;
+	private IAuthorizer authorizer;
+	private ICaptchaProvider captchaProvider;
+	private ListenerManager listenerManager;
+	private String loginPath;
 
-    protected void writeAuthResponse(HttpServletResponse httpResponse, int httpStatus, AuthResponse authResponse) {
-    	WebUtils.writeResponse(httpResponse, httpStatus, JsonUtils.toJsonString(authResponse));
-    }
+	protected boolean isLoginRequest(HttpServletRequest request) {
+		if (!WebUtils.isPostMethod(request)) {
+			return false;
+		}
+		if (StringUtils.isBlank(this.getLoginPath())) {
+			return false;
+		}
+		return WebUtils.pathMatch(this.getLoginPath(), request.getServletPath());
+	}
 
-    protected SecurityManager getSecurityManager() {
-        return securityManager;
-    }
+	protected String checkAndGetAuthorization(HttpServletRequest request) throws UnauthorizedException {
+		String authorization = request.getHeader(HEADER_KEY_AUTHORIZATION);
+		if (StringUtils.isBlank(authorization)) {
+			log.warn(this.getProperties().getTokenBlankTips());
+			throw new UnauthorizedException(this.getProperties().getTokenBlankTips());
+		}
+		return authorization;
+	}
+	
+	protected String getAuthorization(HttpServletRequest request) throws UnauthorizedException {
+		return request.getHeader(HEADER_KEY_AUTHORIZATION);
+	}
 
-    protected void setSecurityManager(SecurityManager securityManager) {
-        this.securityManager = securityManager;
-    }
+	protected void writeAuthResponse(HttpServletResponse httpResponse, int httpStatus, AuthResponse authResponse) {
+		WebUtils.writeResponse(httpResponse, httpStatus, JsonUtils.toJsonString(authResponse));
+	}
 
-    protected String getLoginPath() {
-        return loginPath;
-    }
+	public SecurityProperties getProperties() {
+		return properties;
+	}
 
-    protected void setLoginPath(String loginPath) {
-        this.loginPath = loginPath;
-    }
+	public void setProperties(SecurityProperties properties) {
+		this.properties = properties;
+	}
+
+	protected IAuthenticator getAuthenticator() {
+		return authenticator;
+	}
+
+	protected void setAuthenticator(IAuthenticator authenticator) {
+		this.authenticator = authenticator;
+	}
+
+	public ICaptchaProvider getCaptchaProvider() {
+		return captchaProvider;
+	}
+
+	public void setCaptchaProvider(ICaptchaProvider captchaProvider) {
+		this.captchaProvider = captchaProvider;
+	}
+
+	public ListenerManager getListenerManager() {
+		return listenerManager;
+	}
+
+	public void setListenerManager(ListenerManager listenerManager) {
+		this.listenerManager = listenerManager;
+	}
+
+	public IAuthorizer getAuthorizer() {
+		return authorizer;
+	}
+
+	public void setAuthorizer(IAuthorizer authorizer) {
+		this.authorizer = authorizer;
+	}
+
+	protected String getLoginPath() {
+		return loginPath;
+	}
+
+	protected void setLoginPath(String loginPath) {
+		this.loginPath = loginPath;
+	}
 }

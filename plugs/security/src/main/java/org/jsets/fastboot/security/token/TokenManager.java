@@ -17,7 +17,6 @@
  */
 package org.jsets.fastboot.security.token;
 
-import org.jsets.fastboot.security.Manager;
 import org.jsets.fastboot.security.exception.UnauthorizedException;
 import org.jsets.fastboot.security.session.Session;
 import org.jsets.fastboot.security.auth.AuthenticationInfo;
@@ -29,7 +28,7 @@ import org.jsets.fastboot.security.auth.AuthenticationInfo;
  * @date 2021.07.09 14:23
  * @since 0.1
  */
-public interface TokenManager extends Manager {
+public interface TokenManager {
 
     InnerToken issue(Session session);
 

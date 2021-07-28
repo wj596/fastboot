@@ -21,15 +21,11 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.SignatureException;
 import lombok.extern.slf4j.Slf4j;
-import org.jsets.fastboot.security.SecurityManager;
 import org.jsets.fastboot.security.auth.AuthenticationInfo;
 import org.jsets.fastboot.security.config.SecurityProperties;
 import org.jsets.fastboot.security.exception.UnauthorizedException;
 import org.jsets.fastboot.security.session.Session;
 import org.jsets.fastboot.security.util.CryptoUtils;
-
-import com.google.common.io.BaseEncoding;
-
 import java.util.Objects;
 
 /**
@@ -41,12 +37,10 @@ import java.util.Objects;
 @Slf4j
 public class InnerTokenManager implements TokenManager {
 
-	private SecurityManager securityManager;
 	private SecurityProperties properties;
 
-    public void initialize(SecurityManager securityManager){
-		this.securityManager = securityManager;
-		this.properties = this.securityManager.getProperties();
+    public void initialize(SecurityProperties properties){
+		this.properties = properties;
     }
 
 	@Override

@@ -17,6 +17,8 @@
  */
 package org.jsets.fastboot.security;
 
+import org.jsets.fastboot.security.model.ContextItem;
+
 /**
  * 
  * 安全上下文
@@ -25,26 +27,59 @@ package org.jsets.fastboot.security;
  */
 public class SecurityContext {
 
-	private static final ThreadLocal<String> ctx = new ThreadLocal<String>();
+	private static final ThreadLocal<ContextItem> CTX = new ThreadLocal<ContextItem>();
 	
     /**
      * 设置当前安全上下文中的回话
      */
-    protected static void set(String sessionId) {
-    	SecurityContext.ctx.set(sessionId);
+    protected static void set(ContextItem item) {
+    	SecurityContext.CTX.set(item);
     }
 	
     /**
      * 获取当前上下文中的会话
      */
-    public static String get() {
-        return SecurityContext.ctx.get();
+    public static ContextItem get() {
+        return SecurityContext.CTX.get();
+    }
+    
+    /**
+     * 获取当前上下文中的SessionId
+     */
+    public static String getSessionId() {
+    	ContextItem item = SecurityContext.CTX.get();
+    	if(null!=item) {
+    		return item.getSessionId();
+    	}
+    	return null;
+    }
+    
+    /**
+     * 获取当前上下文中的Token
+     */
+    public static String getToken() {
+    	ContextItem item = SecurityContext.CTX.get();
+    	if(null!=item) {
+    		return item.getToken();
+    	}
+    	return null;
+    }
+    
+    /**
+     * 获取当前上下文中的Username
+     */
+    public static String getUsername() {
+    	ContextItem item = SecurityContext.CTX.get();
+    	if(null!=item) {
+    		return item.getUsername();
+    	}
+    	return null;
     }
     
     /**
      * 删除当前安全上下文中的会话
      */
     protected static void cleanup() {
-    	SecurityContext.ctx.remove();
+    	SecurityContext.CTX.remove();
     }
 }

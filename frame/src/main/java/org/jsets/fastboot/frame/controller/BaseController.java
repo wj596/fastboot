@@ -79,7 +79,7 @@ public abstract class BaseController {
 	 */
 	protected <T> DataResp<T> dataResp(T t) {
 		DataResp<T> respond = DataResp.ok();
-		respond.setData(t);
+		respond.setResult(t);
 		return respond;
 	}
 	
@@ -126,7 +126,7 @@ public abstract class BaseController {
 	 */
 	protected <T> ListResp<T> pageResp(IPage<T> result) {
 		ListResp<T> respond = ListResp.ok();
-		respond.setData(result.getRecords());
+		respond.setResult(result.getRecords());
 		respond.setTotal(result.getTotal());
 		return respond;
 	}

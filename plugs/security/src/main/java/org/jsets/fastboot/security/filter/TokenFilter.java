@@ -19,22 +19,25 @@ package org.jsets.fastboot.security.filter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import java.util.Set;
 
+@Slf4j
 public class TokenFilter extends AbstractInnerFilter {
 
-    @Override
-    public boolean isAccessAllowed(HttpServletRequest request, HttpServletResponse response, Set<String> props) throws Exception {
-        if(this.isLoginRequest(request)){
-            return true;
-        }
-        return false;
-    }
+	@Override
+	public boolean isAccessAllowed(HttpServletRequest request, HttpServletResponse response, Set<String> props)
+			throws Exception {
+		if (this.isLoginRequest(request)) {
+			return true;
+		}
+		return false;
+	}
 
-    @Override
-    public boolean onAccessDenied(HttpServletRequest request, HttpServletResponse response) throws Exception {
+	@Override
+	public boolean onAccessDenied(HttpServletRequest request, HttpServletResponse response) throws Exception {
         String token = this.checkAndGetAuthorization(request);
-        this.getSecurityManager().authenticate(token);
+        this.getAuthenticator().authenticate(token);
         return true;
-    }
+	}
 }

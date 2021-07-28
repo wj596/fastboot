@@ -17,6 +17,7 @@
  */
 package org.jsets.fastboot.security.util;
 
+import com.google.common.hash.Hashing;
 import com.google.common.io.BaseEncoding;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -46,6 +47,17 @@ public class CryptoUtils {
 	public static Claims parseJWT(String jwt, String secretKey) {
 		String content = new String(BaseEncoding.base64().decode(jwt));
 		return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(content).getBody();
+	}
+	
+	public static String hmacSha256(String plan, String secretKey) {
+		return Hashing.hmacSha256(secretKey.getBytes()).hashBytes(plan.getBytes()).toString();
+	}
+	
+	public static void main(String[] args) {
+		Long curr = System.currentTimeMillis();
+		System.out.println(curr);
+		String hmac =  hmacSha256(curr+"fastboot", "abcdee78985eve*fdafec");
+		System.out.println(hmac);
 	}
 
 }

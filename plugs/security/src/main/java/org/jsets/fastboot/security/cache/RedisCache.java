@@ -50,7 +50,11 @@ public class RedisCache implements InnerCache {
 	
 	@Override
 	public boolean hasKey(String key) {
-		return this.redisTemplate.hasKey(this.wrap(key));
+		boolean exist = this.redisTemplate.hasKey(this.wrap(key));
+		if(exist&&this.expire > 0) {
+			this.redisTemplate.expire(this.wrap(key), this.expire, TimeUnit.SECONDS);
+		}
+		return exist;
 	}
 
 	@Override

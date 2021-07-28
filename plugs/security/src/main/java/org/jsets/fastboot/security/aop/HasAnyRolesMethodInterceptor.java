@@ -20,7 +20,7 @@ package org.jsets.fastboot.security.aop;
 import java.lang.annotation.Annotation;
 import org.aspectj.lang.JoinPoint;
 import org.jsets.fastboot.common.util.StringUtils;
-import org.jsets.fastboot.security.SecurityManager;
+import org.jsets.fastboot.security.SecurityUtils;
 import org.jsets.fastboot.security.annotation.HasAnyRoles;
 import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
@@ -28,8 +28,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class HasAnyRolesMethodInterceptor extends AnnotationMethodInterceptor {
 
-	public HasAnyRolesMethodInterceptor(SecurityManager securityManager, Class<? extends Annotation> annotationClass) {
-		super(securityManager, annotationClass);
+	public HasAnyRolesMethodInterceptor(Class<? extends Annotation> annotationClass) {
+		super(annotationClass);
 	}
 
 	@Override
@@ -44,7 +44,7 @@ public class HasAnyRolesMethodInterceptor extends AnnotationMethodInterceptor {
 		
 		HasAnyRoles har = (HasAnyRoles)ann;
 		String[] roles = har.value();
-		boolean allowed = this.getSecurityManager().hasAnyRole(Sets.newHashSet(roles));
+		boolean allowed = SecurityUtils.hasAnyRole(Sets.newHashSet(roles));
 		if(log.isInfoEnabled()) {
 			log.info("访问方法["+ this.getInvokeMethod(joinPoint) +"]需要角色["+ StringUtils.join(roles) +"]，鉴权结果["+ allowed +"]");
 		}
