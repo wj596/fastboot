@@ -22,7 +22,7 @@
 		<spring-boot.version>2.5.0</spring-boot.version>
 		<guava.version>30.1.1-jre</guava.version>
 		<springfox-boot-starter.version>3.0.0</springfox-boot-starter.version>
-		<fb-common.version>0.0.1</fb-common.version>
+		<fb-common.version>0.0.3</fb-common.version>
 		<fb-security.version>0.0.3</fb-security.version>
 		<fb-frame.version>0.0.1</fb-frame.version>
 		<mybatis-plus.version>3.4.2</mybatis-plus.version>
@@ -116,6 +116,7 @@
 						<source>${java.version}</source>
 						<target>${java.version}</target>
 						<encoding>${project.build.sourceEncoding}</encoding>
+						<skip>true</skip>
 					</configuration>
 				</plugin>
 				<plugin>

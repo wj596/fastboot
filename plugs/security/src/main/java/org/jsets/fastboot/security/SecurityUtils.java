@@ -24,6 +24,7 @@ import org.jsets.fastboot.security.cache.InnerCacheManager;
 import org.jsets.fastboot.security.config.SecurityProperties;
 import org.jsets.fastboot.security.exception.UnauthorizedException;
 import org.jsets.fastboot.security.filter.InnerFilterManager;
+import org.jsets.fastboot.security.model.ContextItem;
 import org.jsets.fastboot.security.model.IAccount;
 import org.jsets.fastboot.security.session.Session;
 import org.jsets.fastboot.security.session.SessionManager;
@@ -55,12 +56,25 @@ public class SecurityUtils {
 	private static IAccountProvider accountProvider;
 	private static ICaptchaProvider captchaProvider;
 
+	/**
+	 * 获取当前上下文
+	 */
+	public static ContextItem getContext() {
+		return SecurityContext.get();
+	}
 	
 	/**
 	 * 获取当前上下文中的SessionId
 	 */
 	public static String getSessionId() {
 		return SecurityContext.getSessionId();
+	}
+	
+	/**
+	 * 清空当前上下文
+	 */
+	public static void setContext(ContextItem item) {
+		SecurityContext.set(item);
 	}
 	
 	/**
@@ -75,6 +89,13 @@ public class SecurityUtils {
 	 */
 	public static String getToken() {
 		return SecurityContext.getToken();
+	}
+	
+	/**
+	 * 清空当前上下文
+	 */
+	public static void cleanupContext() {
+		SecurityContext.cleanup();
 	}
 	
 	/**
@@ -105,25 +126,12 @@ public class SecurityUtils {
 		return getSessionManager().get(sessionId);
 	}
 
-	/**
-	 * 获取当前认证的用户
-	 */
-	public static <T extends IAccount> T getAccount() throws UnauthorizedException {
-		Optional<Session> opt = getSession();
-		if (!opt.isPresent()) {
-			throw new UnauthorizedException(getProperties().getUnauthorizedTips());
-		}
-
-		IAccount account = getAccountProvider().loadAccount(opt.get().getUsername());
-		return (T) account;
-	}
-
 	public static String encryptPassword(String plain) {
 		return getEncryptProvider().encrypt(plain);
 	}
 
 	/**
-	 * 执行过滤器链
+	 * 执行内部过滤器链
 	 * 
 	 * @param httpRequest  请求
 	 * @param httpResponse 响应
@@ -144,6 +152,11 @@ public class SecurityUtils {
 		return getCaptchaProvider().generateCaptcha(captchaKey);
 	}
 
+	/**
+	 * HMAC签名
+	 * @param timestamp 时间戳
+	 * @return  String
+	 */
 	public static String hmacSignature(Long timestamp) {
 		String context = timestamp.toString();
 		if (StringUtils.notEmpty(getProperties().getHMACSignSalt())) {
@@ -152,14 +165,18 @@ public class SecurityUtils {
 		return CryptoUtils.hmacSha256(context, getProperties().getHMACSignKey());
 	}
 
+	/**
+	 * HMAC签名验证
+	 * @param timestamp 时间戳
+	 * @param sign 签名
+	 * @return
+	 */
 	public static boolean hmacSignatureValidate(Long timestamp, String sign) {
 		String context = timestamp.toString();
 		if (StringUtils.notEmpty(getProperties().getHMACSignSalt())) {
 			context = context + getProperties().getHMACSignSalt();
 		}
-		
-		System.out.println("ssssssssss "+getProperties().getHMACSignKey());
-		
+
 		String curr = CryptoUtils.hmacSha256(context, getProperties().getHMACSignKey());
 		if (!curr.equals(sign)) {
 			return false;
@@ -198,10 +215,16 @@ public class SecurityUtils {
 	 * 是否认证
 	 */
 	public static boolean isAuthenticated() {
-		System.out.println("sssssss "+getAuthenticator().getClass());
 		return getAuthenticator().isAuthenticated();
 	}
 
+	/**
+	 * 获取当前认证的用户
+	 */
+	public static <T extends IAccount> T getAccount() throws UnauthorizedException {
+		return getAuthenticator().getAccount();
+	}
+	
 	public static boolean hasRole(String roleIdentifier) {
 		return getAuthorizer().hasRole(roleIdentifier);
 	}

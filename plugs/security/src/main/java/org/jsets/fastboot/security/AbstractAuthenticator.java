@@ -8,6 +8,7 @@ import org.jsets.fastboot.security.token.TokenManager;
 public abstract class AbstractAuthenticator implements IAuthenticator {
 	
 	private SecurityProperties properties;
+	private IAccountProvider accountProvider;
 	private RealmManager realmManager;
 	private SessionManager sessionManager;
 	private TokenManager tokenManager;
@@ -36,4 +37,11 @@ public abstract class AbstractAuthenticator implements IAuthenticator {
 	protected void setTokenManager(TokenManager tokenManager) {
 		this.tokenManager = tokenManager;
 	}
+	protected IAccountProvider getAccountProvider() {
+		return accountProvider;
+	}
+	protected void setAccountProvider(IAccountProvider accountProvider) {
+		this.accountProvider = accountProvider;
+	}
+	
 }

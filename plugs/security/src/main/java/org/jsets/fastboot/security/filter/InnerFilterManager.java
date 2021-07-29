@@ -251,7 +251,7 @@ public class InnerFilterManager {
 		}
 
 		if(FILTERS.size()==0) {
-			FILTERS.put(SecurityProperties.FILTER_DEFAULT, new DefaultFilter());
+			this.useDefaultFilter();
 		}
 		
 		FILTERS.forEach((name, filter)->{
@@ -267,6 +267,17 @@ public class InnerFilterManager {
 			log.info("初始化过滤器，名称：{}， 类：{}", name, filter.getClass().getName());
 		});
 		
+	}
+	
+	private void useDefaultFilter() {
+		InnerFilterRule filterRule = new InnerFilterRule();
+		filterRule.setAccessPath("/**");
+		filterRule.setIgnore(false);
+		InnerFilterRule.FilterProps fp = new InnerFilterRule.FilterProps();
+		fp.setName(SecurityProperties.FILTER_DEFAULT);
+		filterRule.getFilters().add(fp);
+		this.RULES.add(filterRule);
+		this.FILTERS.put(SecurityProperties.FILTER_DEFAULT, new DefaultFilter());
 	}
 
 	public boolean doInnerFilterChain(HttpServletRequest httpRequest, HttpServletResponse httpResponse) throws Exception {

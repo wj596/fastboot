@@ -31,6 +31,7 @@ import org.jsets.fastboot.security.dao.PasswdRetryRecordDao;
 import org.jsets.fastboot.security.exception.UnauthorizedException;
 import org.jsets.fastboot.security.listener.ListenerManager;
 import org.jsets.fastboot.security.session.Session;
+import org.jsets.fastboot.common.util.CollectionUtils;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -116,6 +117,9 @@ public class RealmManager {
             return false;
         }
         AuthorizationInfo authorizationInfo = realm.getAuthorizationInfo(session.getUsername());
+        if(CollectionUtils.isEmpty(authorizationInfo.getRoles())) {
+        	return false;
+        }
         return authorizationInfo.getRoles().contains(roleIdentifier);
     }
     
@@ -126,7 +130,10 @@ public class RealmManager {
         }
         
         AuthorizationInfo authorizationInfo = realm.getAuthorizationInfo(session.getUsername());
-		for (Iterator<String> iterator = roleIdentifiers.iterator(); iterator.hasNext();){
+        if(CollectionUtils.isEmpty(authorizationInfo.getRoles())) {
+        	return false;
+        }
+        for (Iterator<String> iterator = roleIdentifiers.iterator(); iterator.hasNext();){
 			String roleIdentifier = iterator.next();
 			if(authorizationInfo.getRoles().contains(roleIdentifier)) {
 				return true;
@@ -142,7 +149,10 @@ public class RealmManager {
         }
         
         AuthorizationInfo authorizationInfo = realm.getAuthorizationInfo(session.getUsername());
-		for (Iterator<String> iterator = roleIdentifiers.iterator(); iterator.hasNext();){
+        if(CollectionUtils.isEmpty(authorizationInfo.getRoles())) {
+        	return false;
+        }
+        for (Iterator<String> iterator = roleIdentifiers.iterator(); iterator.hasNext();){
 			String roleIdentifier = iterator.next();
 			if(!authorizationInfo.getRoles().contains(roleIdentifier)) {
 				return false;
@@ -157,6 +167,9 @@ public class RealmManager {
             return false;
         }
         AuthorizationInfo authorizationInfo = realm.getAuthorizationInfo(session.getUsername());
+        if(CollectionUtils.isEmpty(authorizationInfo.getPermissions())) {
+        	return false;
+        }
         return authorizationInfo.getPermissions().contains(permission);
     }
     
@@ -167,7 +180,10 @@ public class RealmManager {
         }
         
         AuthorizationInfo authorizationInfo = realm.getAuthorizationInfo(session.getUsername());
-		for (Iterator<String> iterator = permissions.iterator(); iterator.hasNext();){
+        if(CollectionUtils.isEmpty(authorizationInfo.getPermissions())) {
+        	return false;
+        }
+        for (Iterator<String> iterator = permissions.iterator(); iterator.hasNext();){
 			String permission = iterator.next();
 			if(authorizationInfo.getPermissions().contains(permission)) {
 				return true;
@@ -184,7 +200,10 @@ public class RealmManager {
         }
         
         AuthorizationInfo authorizationInfo = realm.getAuthorizationInfo(session.getUsername());
-		for (Iterator<String> iterator = permissions.iterator(); iterator.hasNext();){
+        if(CollectionUtils.isEmpty(authorizationInfo.getPermissions())) {
+        	return false;
+        }
+        for (Iterator<String> iterator = permissions.iterator(); iterator.hasNext();){
 			String permission = iterator.next();
 			if(!authorizationInfo.getPermissions().contains(permission)) {
 				return false;

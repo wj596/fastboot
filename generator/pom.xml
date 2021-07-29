@@ -22,11 +22,6 @@
             <optional>true</optional>
         </dependency>
 
-        <dependency>
-            <groupId>org.jsets</groupId>
-            <artifactId>fb-common</artifactId>
-        </dependency>
-
     </dependencies>
   
   

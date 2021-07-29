@@ -4,6 +4,8 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.jsets.fastboot.common.util.StringUtils;
+import org.jsets.fastboot.security.SecurityUtils;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -23,8 +25,10 @@ public class DefaultFilter extends AbstractInnerFilter {
 		String token = getAuthorization(request);
 		if (StringUtils.isBlank(token)) {
 			log.warn("Token为空，PATH:{}", request.getServletPath());
+			SecurityUtils.cleanupContext();
 			return true;
 		} else {
+			log.info("DefaultFilter Token:{}", token);
 			this.getAuthenticator().authenticate(token);
 		}
 		return true;

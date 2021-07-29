@@ -75,9 +75,6 @@ public class SecurityManager {
 	public void initialize() {
 		if (!this.initialized.get()) {
 			this.accountProvider = this.customizer.getAccountProvider();
-//			if (Objects.isNull(this.accountProvider)) {
-//				throw new RuntimeException("请设置AccountProvider");
-//			}
 			this.encryptProvider = this.customizer.getEncryptProvider();
 			if (Objects.isNull(this.encryptProvider)) {
 				this.encryptProvider = new EncryptProviderImpl();
@@ -98,6 +95,7 @@ public class SecurityManager {
 			if(AbstractAuthenticator.class.isAssignableFrom(this.authenticator.getClass()) ){
 				AbstractAuthenticator abstractAuthenticator = (AbstractAuthenticator)this.authenticator;
 				abstractAuthenticator.setProperties(this.properties);
+				abstractAuthenticator.setAccountProvider(this.accountProvider);
 				abstractAuthenticator.setRealmManager(this.realmManager);
 				abstractAuthenticator.setSessionManager(this.sessionManager);
 				abstractAuthenticator.setTokenManager(this.tokenManager);

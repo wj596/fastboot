@@ -3,6 +3,7 @@ package org.jsets.fastboot.security;
 import org.jsets.fastboot.security.auth.AuthRequest;
 import org.jsets.fastboot.security.auth.AuthenticationInfo;
 import org.jsets.fastboot.security.exception.UnauthorizedException;
+import org.jsets.fastboot.security.model.IAccount;
 
 public interface IAuthenticator {
 
@@ -38,4 +39,12 @@ public interface IAuthenticator {
 	 * @return boolean
 	 */
 	boolean isAuthenticated();
+	
+	/**
+	 * 获取当前用户
+	 * @param <T>
+	 * @return
+	 * @throws UnauthorizedException
+	 */
+	<T extends IAccount> T getAccount() throws UnauthorizedException;
 }

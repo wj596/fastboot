@@ -1,11 +1,13 @@
 package org.jsets.fastboot.security;
 
+import java.util.Objects;
 import java.util.Optional;
 import org.jsets.fastboot.common.util.StringUtils;
 import org.jsets.fastboot.security.auth.AuthRequest;
 import org.jsets.fastboot.security.auth.AuthenticationInfo;
 import org.jsets.fastboot.security.exception.UnauthorizedException;
 import org.jsets.fastboot.security.model.ContextItem;
+import org.jsets.fastboot.security.model.IAccount;
 import org.jsets.fastboot.security.session.Session;
 import org.jsets.fastboot.security.token.InnerToken;
 import lombok.extern.slf4j.Slf4j;
@@ -71,5 +73,24 @@ public class AuthenticatorImpl extends AbstractAuthenticator{
 		}
 		return this.getSessionManager().isExists(sessionId);
 	}
+	
+	/**
+	 * 获取当前认证的用户
+	 */
+	public <T extends IAccount> T getAccount() throws UnauthorizedException {
+		String sessionId = SecurityContext.getSessionId();
+		if (Objects.isNull(sessionId)) {
+			throw new UnauthorizedException(getProperties().getUnauthorizedTips());
+		}
+		
+		Optional<Session> opt = getSessionManager().get(sessionId);
+		if (!opt.isPresent()) {
+			throw new UnauthorizedException(getProperties().getUnauthorizedTips());
+		}
+		
+		IAccount account = getAccountProvider().loadAccount(opt.get().getUsername());
+		return (T) account;
+	}
+
 	
 }

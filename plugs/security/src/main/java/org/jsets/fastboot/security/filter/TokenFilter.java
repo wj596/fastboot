@@ -36,7 +36,8 @@ public class TokenFilter extends AbstractInnerFilter {
 
 	@Override
 	public boolean onAccessDenied(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        String token = this.checkAndGetAuthorization(request);
+		String token = this.checkAndGetAuthorization(request);
+		log.info("token: {}",token);
         this.getAuthenticator().authenticate(token);
         return true;
 	}
