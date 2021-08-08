@@ -21,22 +21,22 @@ import lombok.ToString;
 @ToString
 public abstract class BaseEntity extends SuperEntity {
 
-	@ApiModelProperty(value="创建时间")
+	@ApiModelProperty(value = "创建时间")
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	@TableField(fill = FieldFill.INSERT)
 	private Date createTime;
-	
-	@ApiModelProperty(value="创建人")
+
+	@ApiModelProperty(value = "创建人")
 	@JsonSerialize(using = ToStringSerializer.class)
 	@TableField(fill = FieldFill.INSERT)
 	private String createUser;
 
-	@ApiModelProperty(value="更新时间")
+	@ApiModelProperty(value = "更新时间")
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	@TableField(fill = FieldFill.INSERT_UPDATE)
 	private Date updateTime;
-	
-	@ApiModelProperty(value="更新人")
+
+	@ApiModelProperty(value = "更新人")
 	@JsonSerialize(using = ToStringSerializer.class)
 	@TableField(fill = FieldFill.INSERT_UPDATE)
 	private String updateUser;

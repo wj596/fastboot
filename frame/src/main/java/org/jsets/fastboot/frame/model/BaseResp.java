@@ -17,7 +17,7 @@ import lombok.Data;
 public abstract class BaseResp implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	// 身份验证成功
 	public static final String MSG_AUTH_SUCCEED = "auth:succeed";
 	// 身份验证失败
@@ -28,10 +28,10 @@ public abstract class BaseResp implements Serializable {
 	public static final String MSG_AUTH_FORBIDDEN = "auth:forbidden";
 	// 未知错误
 	public static final String MSG_INTERNAL_UNKNOWN_ERROR = "internal:unknown_error";
-	
-	@ApiModelProperty(value="编码")
+
+	@ApiModelProperty(value = "编码")
 	private RespCode code;
-	@ApiModelProperty(value="消息")
+	@ApiModelProperty(value = "消息")
 	private String message;
 
 }

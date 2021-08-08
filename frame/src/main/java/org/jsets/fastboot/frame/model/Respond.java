@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatus;
  * @date 2021.07.10 21:57
  * @since 0.1
  */
-public class Respond extends BaseResp{
+public class Respond extends BaseResp {
 
 	private static final long serialVersionUID = 1L;
 

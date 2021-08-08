@@ -18,20 +18,20 @@ import org.springframework.core.env.Environment;
  * @since 0.1
  */
 @Configuration
-public class BaseConfiguration implements ApplicationContextAware,EnvironmentAware{
+public class BaseConfiguration implements ApplicationContextAware, EnvironmentAware {
 
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		SpringContextHolder.setApplicationContext(applicationContext);
 	}
-	
+
 	@Override
 	public void setEnvironment(Environment environment) {
 		SpringContextHolder.setEnvironment(environment);
 	}
-	
+
 	@Bean
-    public BaseEntityMetaObjectHandler baseEntityMetaObjectHandler() {
+	public BaseEntityMetaObjectHandler baseEntityMetaObjectHandler() {
 		return new BaseEntityMetaObjectHandler();
 	}
 

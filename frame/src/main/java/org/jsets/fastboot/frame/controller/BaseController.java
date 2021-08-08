@@ -63,7 +63,7 @@ public abstract class BaseController {
 	protected <T> Respond failed(String message) {
 		return Respond.fail(message);
 	}
-	
+
 	/**
 	 * 操作失败
 	 * 
@@ -82,45 +82,42 @@ public abstract class BaseController {
 		respond.setResult(t);
 		return respond;
 	}
-	
+
 	/**
 	 * 单条数据响应失败
 	 */
 	protected <T> DataResp<T> dataRespFail() {
 		return DataResp.fail();
 	}
-	
+
 	/**
 	 * 单条数据响应失败
 	 */
 	protected <T> DataResp<T> dataRespFail(String message) {
 		return DataResp.fail(message);
 	}
-	
-	
+
 	/**
 	 * 返回数据列表
 	 */
 	protected <T> ListResp<T> listResp(List<T> ls) {
 		return ListResp.ok();
 	}
-	
-	
+
 	/**
 	 * 数据列表响应失败
 	 */
 	protected <T> ListResp<T> listRespFail() {
 		return ListResp.fail();
 	}
-	
+
 	/**
 	 * 数据列表响应失败
 	 */
 	protected <T> ListResp<T> listRespFail(String message) {
 		return ListResp.fail(message);
 	}
-	
-	
+
 	/**
 	 * 返回分页数据
 	 */
@@ -130,25 +127,26 @@ public abstract class BaseController {
 		respond.setTotal(result.getTotal());
 		return respond;
 	}
-	
+
 	/**
 	 * 分页数据响应失败
 	 */
 	protected <T> ListResp<T> pageResp() {
 		return this.listRespFail();
 	}
-	
+
 	/**
 	 * 分页数据响应失败
 	 */
 	protected <T> ListResp<T> pageResp(String message) {
 		return this.listRespFail(message);
 	}
-	
+
 	/**
 	 * 参数断言
+	 * 
 	 * @param expression 表达式
-	 * @param message 异常消息
+	 * @param message    异常消息
 	 */
 	protected void argThat(final boolean expression, final String message) {
 		if (!expression) {
@@ -158,9 +156,10 @@ public abstract class BaseController {
 
 	/**
 	 * 参数断言
+	 * 
 	 * @param expression 表达式
-	 * @param formatter 消息格式
-	 * @param args 消息参数
+	 * @param formatter  消息格式
+	 * @param args       消息参数
 	 */
 	protected void argThat(final boolean expression, final String formatter, final Object... args) {
 		if (!expression) {
@@ -170,37 +169,40 @@ public abstract class BaseController {
 
 	/**
 	 * 断言参数不为空
-	 * @param argument 参数
+	 * 
+	 * @param argument     参数
 	 * @param argumentName 参数名称
 	 */
 	protected void argNotNull(final Object argument, final String argumentName) {
 		if (Objects.isNull(argument)) {
-			throw new IllegalArgumentException("参数["+argumentName+"],不能为空");
+			throw new IllegalArgumentException("参数[" + argumentName + "],不能为空");
 		}
 	}
 
 	/**
 	 * 断言参数不为空字符串
-	 * @param argument 参数
+	 * 
+	 * @param argument     参数
 	 * @param argumentName 参数名称
 	 */
 	protected void argNotEmpty(final String argument, final String argumentName) {
 		if (StringUtils.isEmpty(argument)) {
-			throw new IllegalArgumentException("参数["+argumentName+"],不能为空");
+			throw new IllegalArgumentException("参数[" + argumentName + "],不能为空");
 		}
 	}
 
 	/**
 	 * 断言参数不为空白字符串
-	 * @param argument 参数
+	 * 
+	 * @param argument     参数
 	 * @param argumentName 参数名称
 	 */
 	protected void argNotBlank(final String argument, final String argumentName) {
 		if (StringUtils.isBlank(argument)) {
-			throw new IllegalArgumentException("参数["+argumentName+"],不能为空或空白字符串");
+			throw new IllegalArgumentException("参数[" + argumentName + "],不能为空或空白字符串");
 		}
 	}
-	
+
 	protected void assertThat(final boolean expression, final RuntimeException exception) {
 		if (!expression) {
 			throw exception;

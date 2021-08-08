@@ -7,6 +7,7 @@ import org.springframework.core.env.Environment;
 
 /**
  * spring context 静态持有类
+ * 
  * @author wangjie (https://github.com/wj596)
  * @date 2021.07.10 21:57
  * @since 0.1
@@ -54,22 +55,22 @@ public class SpringContextHolder {
 		checkApplicationContext();
 		return applicationContext.getBean(requiredType);
 	}
-	
+
 	public static <T> T tryBean(Class<T> clazz) {
 		checkApplicationContext();
 		try {
 			return applicationContext.getBean(clazz);
-		}catch (Exception e) {
+		} catch (Exception e) {
 			// ignore
 		}
 		return null;
 	}
-	
+
 	public static <T> Map<String, T> tryBeans(Class<T> clazz) {
 		checkApplicationContext();
 		try {
 			return applicationContext.getBeansOfType(clazz);
-		}catch (Exception e) {
+		} catch (Exception e) {
 			// ignore
 		}
 		return null;

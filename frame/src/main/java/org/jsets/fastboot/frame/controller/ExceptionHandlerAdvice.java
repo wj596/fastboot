@@ -43,14 +43,14 @@ public class ExceptionHandlerAdvice {
 		log.error(e.getMessage(), e);
 		return Respond.fail(HttpStatus.UNAUTHORIZED, e.getMessage());
 	}
-	
+
 	@ResponseStatus(HttpStatus.FORBIDDEN)
 	@ExceptionHandler(RuntimeForbiddenException.class)
 	public Respond runtimeForbiddenException(RuntimeForbiddenException e) {
 		log.error(e.getMessage(), e);
 		return Respond.fail(HttpStatus.FORBIDDEN, e.getMessage());
 	}
-	
+
 	@ResponseStatus(HttpStatus.UNAUTHORIZED)
 	@ExceptionHandler(UnauthorizedException.class)
 	public Respond authenticationException(UnauthorizedException e) {
@@ -64,7 +64,7 @@ public class ExceptionHandlerAdvice {
 		log.error(e.getMessage(), e);
 		return Respond.fail(HttpStatus.FORBIDDEN, e.getMessage());
 	}
-	
+
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	@ExceptionHandler(value = Exception.class)
 	public Respond exception(Exception exception) {

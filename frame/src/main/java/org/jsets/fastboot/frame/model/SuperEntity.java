@@ -13,9 +13,9 @@ import lombok.ToString;
 @ToString
 public class SuperEntity implements Serializable {
 
-	@ApiModelProperty(value="主键")
+	@ApiModelProperty(value = "主键")
 	@TableId(type = IdType.ASSIGN_ID)
 	@JsonSerialize(using = ToStringSerializer.class)
 	private Long id;
-	
+
 }

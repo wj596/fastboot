@@ -6,8 +6,7 @@ import lombok.Data;
 
 /**
  * 
- * 数据响应
- * <br>
+ * 数据响应 <br>
  * 使用泛型，对swagger友好
  *
  * @author wangjie (https://github.com/wj596)
@@ -16,30 +15,30 @@ import lombok.Data;
  */
 @Data
 @JsonInclude(value = JsonInclude.Include.NON_NULL)
-public class DataResp<T> extends BaseResp{
+public class DataResp<T> extends BaseResp {
 
 	private static final long serialVersionUID = 1L;
 
-	@ApiModelProperty(value="数据ss")
+	@ApiModelProperty(value = "数据ss")
 	private T result;
-	
+
 	public static <T> DataResp<T> ok() {
 		DataResp<T> baseReturn = new DataResp<T>();
 		baseReturn.setCode(RespCode.SUCCEED);
 		return baseReturn;
 	}
-	
+
 	public static <T> DataResp<T> fail() {
 		DataResp<T> baseReturn = new DataResp<T>();
 		baseReturn.setCode(RespCode.FAILED);
 		return baseReturn;
 	}
-	
+
 	public static <T> DataResp<T> fail(String message) {
 		DataResp<T> baseReturn = new DataResp<T>();
 		baseReturn.setCode(RespCode.FAILED);
 		baseReturn.setMessage(message);
 		return baseReturn;
 	}
-	
+
 }
