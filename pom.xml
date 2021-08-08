@@ -22,12 +22,14 @@
 		<spring-boot.version>2.5.0</spring-boot.version>
 		<guava.version>30.1.1-jre</guava.version>
 		<springfox-boot-starter.version>3.0.0</springfox-boot-starter.version>
-		<fb-common.version>0.0.3</fb-common.version>
-		<fb-security.version>0.0.3</fb-security.version>
-		<fb-frame.version>0.0.1</fb-frame.version>
 		<mybatis-plus.version>3.4.2</mybatis-plus.version>
 		<druid.version>1.2.6</druid.version>
 		<jjwt.version>0.9.1</jjwt.version>
+
+		<fb-common.version>0.0.3</fb-common.version>
+		<fb-security.version>0.0.3</fb-security.version>
+		<fb-generator.version>0.0.1</fb-generator.version>
+		<fb-frame.version>0.0.1</fb-frame.version>
 	</properties>
 
 	<dependencies>
@@ -73,7 +75,13 @@
 				<artifactId>fb-frame</artifactId>
 				<version>${fb-frame.version}</version>
 			</dependency>
-
+			
+			<dependency>
+				<groupId>org.jsets</groupId>
+				<artifactId>fb-generator</artifactId>
+				<version>${fb-generator.version}</version>
+			</dependency>
+	
 			<dependency>
 				<groupId>org.jetbrains.kotlin</groupId>
 				<artifactId>kotlin-stdlib-jdk8</artifactId>

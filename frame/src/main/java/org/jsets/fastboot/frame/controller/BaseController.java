@@ -162,7 +162,7 @@ public abstract class BaseController {
 	 * @param formatter 消息格式
 	 * @param args 消息参数
 	 */
-	protected void argumentThat(final boolean expression, final String formatter, final Object... args) {
+	protected void argThat(final boolean expression, final String formatter, final Object... args) {
 		if (!expression) {
 			throw new IllegalArgumentException(String.format(formatter, args));
 		}
@@ -184,7 +184,7 @@ public abstract class BaseController {
 	 * @param argument 参数
 	 * @param argumentName 参数名称
 	 */
-	protected void stringArgNotEmpty(final String argument, final String argumentName) {
+	protected void argNotEmpty(final String argument, final String argumentName) {
 		if (StringUtils.isEmpty(argument)) {
 			throw new IllegalArgumentException("参数["+argumentName+"],不能为空");
 		}
@@ -195,9 +195,15 @@ public abstract class BaseController {
 	 * @param argument 参数
 	 * @param argumentName 参数名称
 	 */
-	protected void stringArgNotBlank(final String argument, final String argumentName) {
+	protected void argNotBlank(final String argument, final String argumentName) {
 		if (StringUtils.isBlank(argument)) {
 			throw new IllegalArgumentException("参数["+argumentName+"],不能为空或空白字符串");
+		}
+	}
+	
+	protected void assertThat(final boolean expression, final RuntimeException exception) {
+		if (!expression) {
+			throw exception;
 		}
 	}
 

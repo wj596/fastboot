@@ -6,11 +6,17 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+
+import java.util.Date;
+
 import org.jsets.fastboot.frame.model.BaseEntity;
 import org.jsets.fastboot.model.enums.system.Sex;
 import org.jsets.fastboot.model.enums.system.UserStatus;
 import org.jsets.fastboot.security.model.IAccount;
+import org.springframework.format.annotation.DateTimeFormat;
+
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 @Data
 @NoArgsConstructor
@@ -45,6 +51,11 @@ public class User extends BaseEntity implements IAccount {
 	
 	@ApiModelProperty(value="性别")
 	private Sex sex;// 性别
+	
+	@ApiModelProperty(value="生日")
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	@JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
+	private Date birthday;
 	
 	@ApiModelProperty(value="头像")
 	private String avatar;// 头像

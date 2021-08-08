@@ -1,6 +1,5 @@
 package org.jsets.fastboot.generator.model;
 
-import java.io.Serializable;
 import java.util.List;
 import com.google.common.collect.Lists;
 import lombok.Data;
@@ -10,11 +9,8 @@ import lombok.ToString;
 @Data
 @NoArgsConstructor
 @ToString
-public class TableInfo implements Serializable {
-	
-	private static final long serialVersionUID = 1L;
+public class EntityInfo {
 	
     private String name;
-    private String desc;
-    
+    private List<FieldInfo> fieldInfos = Lists.newLinkedList();
 }

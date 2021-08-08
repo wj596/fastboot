@@ -58,4 +58,9 @@ public class UserService extends BaseService<User, UserMapper> implements IUserS
 		return this.roleResourceMapper.selectFuncCodeListByUsername(username);
 	}
 
+	@Override
+	public Optional<User> findByAccount(String username) {
+		return this.findOne(this.getLambdaWrapper().eq(User::getAccount, username));
+	}
+
 }
